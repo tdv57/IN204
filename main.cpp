@@ -3,6 +3,7 @@
 #include <SFML/System/String.hpp>
 #include <iostream>
 #include <cmath>
+#include <memory>
 
 
 /******************************************************************************************************************************************** */
@@ -10,41 +11,6 @@
 /********************************-------Déclaration des différentes formes de figures---------------------*************************************/
 /******************************************************************************************************************************************** */
 /******************************************************************************************************************************************** */
-
-// Figure -> 23
-//            01
-class Fig1;
-
-// Figure -> 3
-//           2
-//           1
-//           0 
-class Fig2;
-
-// Figure ->  3
-//            2
-//           01
-class Fig3;
-
-// Figure -> 123
-//            0
-class Fig4;
-
-
-// Figure -> 3
-//           2
-//           10
-class Fig5; 
-
-
-// Figure ->  32
-//           10
-class Fig6;
-
-
-// Figure -> 32
-//           10
-class Fig7;
 
 
 sf::Vector2i operator * (const size_t& side,const sf::Vector2i v){
@@ -73,7 +39,7 @@ private:
     size_t m_initY;
     sf::Color m_color;
 
-    
+
 public:
 
     Square():m_side(0){}
@@ -104,10 +70,28 @@ public:
         return m_side;
     }
 
+    sf::Color getColor() const{
+        return m_color;
+    }
+
     template<typename T>
     requires std::integral<T>
     void setSide(T newside){
         m_side = newside;
+    }
+
+    bool operator ==(const Square &it){
+        if(it.getColor() == getColor() && it.getSide()==m_side){
+            return true;
+        }
+        return false;
+    }
+
+    bool operator !=(const Square &it){
+        if(it.getColor() != getColor() || it.getSide()!=m_side){
+            return true;
+        }
+        return false;
     }
 
 private:
@@ -138,8 +122,10 @@ protected:
     int m_bottomOrdIndex;
     int m_leftAbsIndex;
     int m_rightAbsIndex;
+    int m_topOrdIndex;
     int m_bottomAbs;
     int m_bottomOrd;
+
     // On va créer pour chaque classe fille une initialisation
 
 
@@ -176,9 +162,12 @@ public:
             m_squaresVector[i].move(m_side * sf::Vector2f(0,1));
         }
         m_bottomOrdIndex +=1;
+        m_topOrdIndex +=1;
     }
 
-
+    sf::Color getColor()const{
+        return m_color;
+    }
     auto getSquaresIndex() const{
         return m_squaresIndex;
     }
@@ -237,36 +226,72 @@ private:
 
     static constexpr std::array<std::array<std::array<sf::Vector2i, 4>, 4>, 7> m_changeArray = {{
         {{   
+        // Figure -> 23
+        //            01
             {{sf::Vector2i(0, 0), sf::Vector2i(0, -2), sf::Vector2i(2, 0), sf::Vector2i(0, 0)}},{{sf::Vector2i(0, 0), sf::Vector2i(0, 2), sf::Vector2i(-2, 0), sf::Vector2i(0, 0)}}   
         }},
         {{   
+        // Figure -> 3
+        //           2
+        //           1
+        //           0 
             {{sf::Vector2i(0, 0), sf::Vector2i(1, 1), sf::Vector2i(-1, 2), sf::Vector2i(-2, 3)}},{{sf::Vector2i(0, 0), sf::Vector2i(-1, -1), sf::Vector2i(1, -2), sf::Vector2i(2, -3)}}   
         }},
         {{   
+        // Figure ->  2
+        //            1
+        //           30 
             {{sf::Vector2i(0, 0), sf::Vector2i(-2, 0), sf::Vector2i(-2, 2), sf::Vector2i(0, 0)}},{{sf::Vector2i(0, -2), sf::Vector2i(1, 0), sf::Vector2i(1, 0), sf::Vector2i(0, -2)}},{{sf::Vector2i(-2, 1), sf::Vector2i(1, 0), sf::Vector2i(1, 0),sf::Vector2i(0, 1) }},{{sf::Vector2i(2, 1), sf::Vector2i(0, 0), sf::Vector2i(0, -2), sf::Vector2i(0, 1)}}      
         }},
         {{   
+        // Figure -> 123
+        //            0
             {{sf::Vector2i(1, 0), sf::Vector2i(2, -1), sf::Vector2i(0, 0), sf::Vector2i(0,0)}},{{sf::Vector2i(0, 0), sf::Vector2i(-1, 1), sf::Vector2i(-1, 1), sf::Vector2i(-1, 1)}}, {{sf::Vector2i(0, -1), sf::Vector2i(0,0), sf::Vector2i(1, -2), sf::Vector2i(0, 0)}},{{sf::Vector2i(-1, 1), sf::Vector2i(-1, 0), sf::Vector2i(0, 1), sf::Vector2i(1, -1)}}  
         }},
         {{   
+        // Figure -> 3
+        //           2
+        //           10
             {{sf::Vector2i(0,-1), sf::Vector2i(0, -1), sf::Vector2i(-1, 1), sf::Vector2i(-1, 1)}},{{sf::Vector2i(0, 0), sf::Vector2i(1, -1), sf::Vector2i(2, 0), sf::Vector2i(1, -1)}},{{sf::Vector2i(0, 0), sf::Vector2i(-1, 2), sf::Vector2i(0, 0), sf::Vector2i(-1, 2)}},{{sf::Vector2i(0, 1), sf::Vector2i(0, 0), sf::Vector2i(-1, -1), sf::Vector2i(1, -2)}}       
         }},
         {{   
+        // Figure ->  32
+        //           10
             {{sf::Vector2i(0, -2), sf::Vector2i(2, 0), sf::Vector2i(0, 0), sf::Vector2i(0, 0)}},{{sf::Vector2i(0, 2), sf::Vector2i(-2, 0), sf::Vector2i(0, 0), sf::Vector2i(0, 0)}}   
         }},
         {{   
+        // Figure -> 32
+        //           10
             {{sf::Vector2i(0, 0), sf::Vector2i(0, 0), sf::Vector2i(0, 0), sf::Vector2i(0, 0)}}   
         }}
     }};
 
-    static constexpr std::array<std::array<sf::Vector2i,4>,7> m_changeAbsArray = {{
-        {{ sf::Vector2i(1,0) , sf::Vector2i(-1,0)}},
-        {{ sf::Vector2i(-2,1) , sf::Vector2i(2,-1)}},
-        {{ sf::Vector2i(1,0) , sf::Vector2i(-1,-1), sf::Vector2i(1,1), sf::Vector2i(-1,0)}},
-        {{ sf::Vector2i(-1,0) , sf::Vector2i(1,0), sf::Vector2i(-1,0), sf::Vector2i(1,0)}},
-        {{ sf::Vector2i(1,0) , sf::Vector2i(-1,0), sf::Vector2i(1,0), sf::Vector2i(-1,0)}},
-        {{ sf::Vector2i(-1,0) , sf::Vector2i(1,0)}},
-        {{ sf::Vector2i(0,0)}}
+    static constexpr std::array<std::array<sf::Vector3i,4>,7> m_changeAbsArray = {{
+        // Figure -> 23
+        //            01
+        {{ sf::Vector3i(1,0,-1) , sf::Vector3i(-1,0,1)}},
+        // Figure -> 3
+        //           2
+        //           1
+        //           0 
+        {{ sf::Vector3i(-2,1,3) , sf::Vector3i(2,-1,-3)}},
+        // Figure ->  2
+        //            1
+        //           30
+        {{ sf::Vector3i(1,0,1) , sf::Vector3i(-1,-1,-1), sf::Vector3i(1,1,1), sf::Vector3i(-1,0,-1)}},
+        // Figure -> 123
+        //            0
+        {{ sf::Vector3i(-1,0,-1) , sf::Vector3i(1,0,1), sf::Vector3i(-1,0,-1), sf::Vector3i(1,0,1)}},
+        // Figure -> 3
+        //           2
+        //           10
+        {{ sf::Vector3i(1,0,1) , sf::Vector3i(-1,0,-1), sf::Vector3i(1,0,1), sf::Vector3i(-1,0,-1)}},
+        // Figure ->  32
+        //           10
+        {{ sf::Vector3i(-1,0,-1) , sf::Vector3i(1,0,1)}},
+        // Figure -> 32
+        //           10
+        {{ sf::Vector3i(0,0,0)}}
     }};
 
     int m_changeIndex;
@@ -285,7 +310,7 @@ public:
             m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex,bottomOrdIndex-1));
             // Je trace  avec setSquares()
             setSquares();
-                    
+            m_topOrdIndex = bottomOrdIndex-1;
             m_leftAbsIndex = bottomAbsIndex-1;
             m_rightAbsIndex = bottomAbsIndex+1;            
         }
@@ -297,19 +322,20 @@ public:
             m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex,bottomOrdIndex-3));
             // Je trace  avec setSquares()
             setSquares();
-                    
+            m_topOrdIndex = bottomOrdIndex -3;
             m_leftAbsIndex = bottomAbsIndex;
             m_rightAbsIndex = bottomAbsIndex;
         }
         else if(figNum==3){
             // Je rajoute squaresIndex
             m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex,bottomOrdIndex));
-            m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex,bottomOrdIndex+1));
-            m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex,bottomOrdIndex+2));
+            m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex,bottomOrdIndex-1));
+            m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex,bottomOrdIndex-2));
             m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex-1,bottomOrdIndex));
             // Je trace  avec setSquares()
             setSquares();
-                    
+            
+            m_topOrdIndex = bottomOrdIndex-2;
             m_leftAbsIndex = bottomAbsIndex;
             m_rightAbsIndex = bottomAbsIndex+1;           
         }
@@ -321,7 +347,8 @@ public:
             m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex+1,bottomOrdIndex-1));
             // Je trace  avec setSquares()
             setSquares();
-                    
+            
+            m_topOrdIndex =  bottomOrdIndex-1;
             m_leftAbsIndex = bottomAbsIndex-1;
             m_rightAbsIndex = bottomAbsIndex+1;
         }
@@ -333,7 +360,8 @@ public:
             m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex-1,bottomOrdIndex-2));
             // Je trace  avec setSquares()
             setSquares();
-                    
+        
+            m_topOrdIndex = bottomOrdIndex-2;
             m_leftAbsIndex = bottomAbsIndex-1;
             m_rightAbsIndex = bottomAbsIndex;            
         }
@@ -345,7 +373,8 @@ public:
             m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex,bottomOrdIndex-1));
             // Je trace  avec setSquares()
             setSquares();
-                    
+            
+            m_topOrdIndex = bottomOrdIndex-1;
             m_leftAbsIndex = bottomAbsIndex-1;
             m_rightAbsIndex = bottomAbsIndex+1;
         }
@@ -357,6 +386,7 @@ public:
             // Je trace  avec setSquares()
             setSquares();
                     
+            m_topOrdIndex = bottomOrdIndex-1;
             m_leftAbsIndex = bottomAbsIndex-1;
             m_rightAbsIndex = bottomAbsIndex;
         }
@@ -435,29 +465,163 @@ public:
 };
 
 
-class tableau{
+class GameBoard{
     // vector<std::array<Square,11>
-    // 22 longueurs 10 largeurs // Il faut des cases en plus invisibles pour charger l'objet
-
+    // 22 longueurs 10 largeurs // Il faut des cases en plus invisibles pour charger l'objet   
+private:
 
     
-private:
-    std::vector<std::array<Square,10>> tableau_m;
-    size_t m_nbLine;
+    size_t m_nbRow;
     size_t m_nbColumn;
     size_t m_initX;
     size_t m_initY;
-    Figure m_activFig;
+    size_t m_side;
+    unsigned int m_level;
+    std::shared_ptr<TetrisFigure> m_activFig;
+    
     // Ou alors std::array<std::array<Square,10>,23> tableau_m (j'ai mis 23 car on aura deux case à cacher); 
     // ON va lui mettre un std::vector de figure (des pointeurs) 
 
+
+public:
+
+    std::vector<std::vector<Square>> m_gameBoard;
+
+
+    GameBoard(size_t nbRow,size_t nbColumn,size_t initX,size_t initY,size_t side):m_nbRow(nbRow),m_nbColumn(nbColumn),m_initX(initX),m_initY(initY),m_side(side),m_level(0){
+        m_gameBoard.resize(m_nbRow, std::vector<Square>(m_nbColumn, Square(m_side))); 
+             
+    }
+
+    bool goDown(){
+        if(!isBottomCollision()){
+            m_activFig->goDown();
+            return true;
+        }
+        collision();
+        return false;
+    }
+
+    bool goLeft(){
+        if(!isLeftCollision()){
+            m_activFig->goLeft();
+            return true;
+        }
+        return false;
+    }
+
+    bool goRight(){
+        if(!isRightCollision()){
+            m_activFig->goRight();
+            return true;
+        }
+        return false;
+    }
+
+    sf::Vector2f getInit() const{
+        return sf::Vector2f(m_initX,m_initY);
+    }
+
+    unsigned int getLevel() const{
+        return m_level;
+    }
+
+    void draw(sf::RenderWindow& window ){
+        for(int i=0;i<m_nbRow;i++){
+            for(int j=0;j<m_nbRow;j++){
+                window.draw(m_gameBoard[i][j]);
+            }
+        }
+        m_activFig->draw(window);
+    }
+
+    
+
+private:
+
+    bool isBottomCollision(){
+        int bottomOrdIndex = m_activFig->getBottomOrdIndex();
+        if(bottomOrdIndex == m_nbRow-1){
+            return true;
+        }
+        auto squaresIndex = m_activFig->getSquaresIndex();
+        for(int i=0; i<squaresIndex.size(); i++){
+            if(squaresIndex[i].y==bottomOrdIndex  && m_gameBoard[squaresIndex[i].x][squaresIndex[i].y+1] != Square(m_side)  ){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool isLeftCollision(){
+        int leftAbsIndex = m_activFig->getLeftAbsIndex();
+        if(leftAbsIndex <= 0){
+            return true;
+        }
+        auto squaresIndex = m_activFig->getSquaresIndex();
+        for(int i=0;i<squaresIndex.size();i++){
+            if(squaresIndex[i].x==leftAbsIndex  && m_gameBoard[squaresIndex[i].x-1][squaresIndex[i].y] != Square(m_side)  ){
+                return true;
+            }
+        }
+        return false;            
+    }
+
+    bool isRightCollision(){
+        int rightAbsIndex = m_activFig->getRightAbsIndex();
+        if(rightAbsIndex >= m_nbColumn-1){
+            return true;
+        }
+        auto squaresIndex = m_activFig->getSquaresIndex();
+        for(int i=0;i<squaresIndex.size();i++){
+            if(squaresIndex[i].x==rightAbsIndex  && m_gameBoard[squaresIndex[i].x+1][squaresIndex[i].y] != Square(m_side)  ){
+                return true;
+            }
+        }
+        return false;            
+    }
+
+
+    void collision(){
+        auto squaresIndex = m_activFig->getSquaresIndex();
+        for(int i=0 ; i<squaresIndex.size();i++){
+            m_gameBoard[squaresIndex[i].x][squaresIndex[i].y] = Square(m_side,m_activFig->getColor(),m_initX + squaresIndex[i].x*m_side , m_initY + squaresIndex[i].y*m_side  );
+        }
+
+        m_activFig.reset();
+    }
+
+
+
 };
 
-class generator{
+class TetrisColor{
+public:
+    static constexpr sf::Color Orange = sf::Color(255,165,0);
+    static constexpr sf::Color Black = sf::Color::Black;
+    static constexpr sf::Color Magenta = sf::Color::Magenta;
+    static constexpr sf::Color Red = sf::Color::Red;
+    static constexpr sf::Color Yellow = sf::Color::Yellow;
+    static constexpr sf::Color Green = sf::Color::Green;
+    static constexpr sf::Color Cyan = sf::Color::Cyan;
+    static constexpr sf::Color Blue = sf::Color::Blue;
+};
+
+class Generator{
+
+static constexpr std::array<sf::Color,7> m_tetrisColor = { TetrisColor::Yellow , TetrisColor::Blue, TetrisColor::Red , TetrisColor::Magenta , TetrisColor::Green,TetrisColor::Orange,TetrisColor::Cyan};
+public:
+
+std::shared_ptr<TetrisFigure> newTetrisFigure(int side,int bottomAbsIndex,int bottomOrdIndex,int bottomAbs, int bottomOrd){
+    int figNum = 1 + (std::rand() % 7);
+    sf::Color color = m_tetrisColor[std::rand()%7];
+    return std::make_shared<TetrisFigure>(side,color,bottomAbsIndex,bottomOrdIndex,bottomAbs,bottomOrd,figNum);
+}
  // Le générateur de figure 
 };
 
 int main(){
+    std::srand(std::time(nullptr));
     sf::RenderWindow window(sf::VideoMode({1200,800}),"Fenetre de test");
     window.setVerticalSyncEnabled(true);
     window.setPosition({0,0});
@@ -470,7 +634,7 @@ int main(){
     sprite.setTextureRect(sf::IntRect({0,0},{400,400}));
     Square FirstCarre(40,sf::Color::Red,100,100);
 
-    TetrisFigure FirstFig1(50,sf::Color::Red,32,32,150,150,4);
+    TetrisFigure FirstFig1(50,sf::Color::Red,32,32,150,150,3);
     
     while(window.isOpen()){
         while(std::optional event = window.pollEvent()){
@@ -499,7 +663,6 @@ int main(){
                 }
             }
         }
-        std::cout << window.getPosition().x << " " << window.getPosition().y<< std::endl;
         window.clear();
         FirstCarre.move({1,1});
         window.draw(FirstCarre);
