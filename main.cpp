@@ -65,6 +65,15 @@ sf::Vector2f operator * (const sf::Vector2f v,const size_t& side){
 
 
 class Square: public sf::Drawable, public sf::Transformable { 
+
+private:
+    sf::VertexArray m_vertices;
+    size_t m_side;
+    size_t m_initX;
+    size_t m_initY;
+    sf::Color m_color;
+
+    
 public:
 
     Square():m_side(0){}
@@ -112,17 +121,26 @@ private:
     }
 
 
-    sf::VertexArray m_vertices;
-    size_t m_side;
-    size_t m_initX;
-    size_t m_initY;
-    sf::Color m_color;
 };
 
 
 
 
 class Figure {
+
+protected:
+
+    sf::Color m_color;
+    size_t m_side;
+    std::vector<Square> m_squaresVector; // Je crois qu'on en a pas besoin
+    std::vector<sf::Vector2i> m_squaresIndex;
+    int m_bottomAbsIndex;
+    int m_bottomOrdIndex;
+    int m_leftAbsIndex;
+    int m_rightAbsIndex;
+    int m_bottomAbs;
+    int m_bottomOrd;
+    // On va créer pour chaque classe fille une initialisation
 
 
 public:
@@ -208,26 +226,54 @@ public:
 
     // Une figure c'est plusieurs carrés qu'on va générer avec des vertex et des triangles
     // C'est également une abscisse et une ordonnée pour chaque carré
-protected:
 
-
-
-    sf::Color m_color;
-    size_t m_side;
-    std::vector<Square> m_squaresVector; // Je crois qu'on en a pas besoin
-    std::vector<sf::Vector2i> m_squaresIndex;
-    int m_bottomAbsIndex;
-    int m_bottomOrdIndex;
-    int m_leftAbsIndex;
-    int m_rightAbsIndex;
-    int m_bottomAbs;
-    int m_bottomOrd;
-    // On va créer pour chaque classe fille une initialisation
     
 };
 
 
 class TetrisFigure: public Figure{
+
+private:
+
+    static constexpr std::array<std::array<std::array<sf::Vector2i, 4>, 4>, 7> m_changeArray = {{
+        {{   
+            {{sf::Vector2i(0, 0), sf::Vector2i(0, -2), sf::Vector2i(2, 0), sf::Vector2i(0, 0)}},{{sf::Vector2i(0, 0), sf::Vector2i(0, 2), sf::Vector2i(-2, 0), sf::Vector2i(0, 0)}}   
+        }},
+        {{   
+            {{sf::Vector2i(0, 0), sf::Vector2i(1, 1), sf::Vector2i(-1, 2), sf::Vector2i(-2, 3)}},{{sf::Vector2i(0, 0), sf::Vector2i(-1, -1), sf::Vector2i(1, -2), sf::Vector2i(2, -3)}}   
+        }},
+        {{   
+            {{sf::Vector2i(0, 0), sf::Vector2i(-2, 0), sf::Vector2i(-2, 2), sf::Vector2i(0, 0)}},{{sf::Vector2i(0, -2), sf::Vector2i(1, 0), sf::Vector2i(1, 0), sf::Vector2i(0, -2)}},{{sf::Vector2i(-2, 1), sf::Vector2i(1, 0), sf::Vector2i(1, 0),sf::Vector2i(0, 1) }},{{sf::Vector2i(2, 1), sf::Vector2i(0, 0), sf::Vector2i(0, -2), sf::Vector2i(0, 1)}}      
+        }},
+        {{   
+            {{sf::Vector2i(1, 0), sf::Vector2i(2, -1), sf::Vector2i(0, 0), sf::Vector2i(0,0)}},{{sf::Vector2i(0, 0), sf::Vector2i(-1, 1), sf::Vector2i(-1, 1), sf::Vector2i(-1, 1)}}, {{sf::Vector2i(0, -1), sf::Vector2i(0,0), sf::Vector2i(1, -2), sf::Vector2i(0, 0)}},{{sf::Vector2i(-1, 1), sf::Vector2i(-1, 0), sf::Vector2i(0, 1), sf::Vector2i(1, -1)}}  
+        }},
+        {{   
+            {{sf::Vector2i(0,-1), sf::Vector2i(0, -1), sf::Vector2i(-1, 1), sf::Vector2i(-1, 1)}},{{sf::Vector2i(0, 0), sf::Vector2i(1, -1), sf::Vector2i(2, 0), sf::Vector2i(1, -1)}},{{sf::Vector2i(0, 0), sf::Vector2i(-1, 2), sf::Vector2i(0, 0), sf::Vector2i(-1, 2)}},{{sf::Vector2i(0, 1), sf::Vector2i(0, 0), sf::Vector2i(-1, -1), sf::Vector2i(1, -2)}}       
+        }},
+        {{   
+            {{sf::Vector2i(0, -2), sf::Vector2i(2, 0), sf::Vector2i(0, 0), sf::Vector2i(0, 0)}},{{sf::Vector2i(0, 2), sf::Vector2i(-2, 0), sf::Vector2i(0, 0), sf::Vector2i(0, 0)}}   
+        }},
+        {{   
+            {{sf::Vector2i(0, 0), sf::Vector2i(0, 0), sf::Vector2i(0, 0), sf::Vector2i(0, 0)}}   
+        }}
+    }};
+
+    static constexpr std::array<std::array<sf::Vector2i,4>,7> m_changeAbsArray = {{
+        {{ sf::Vector2i(1,0) , sf::Vector2i(-1,0)}},
+        {{ sf::Vector2i(-2,1) , sf::Vector2i(2,-1)}},
+        {{ sf::Vector2i(1,0) , sf::Vector2i(-1,-1), sf::Vector2i(1,1), sf::Vector2i(-1,0)}},
+        {{ sf::Vector2i(-1,0) , sf::Vector2i(1,0), sf::Vector2i(-1,0), sf::Vector2i(1,0)}},
+        {{ sf::Vector2i(1,0) , sf::Vector2i(-1,0), sf::Vector2i(1,0), sf::Vector2i(-1,0)}},
+        {{ sf::Vector2i(-1,0) , sf::Vector2i(1,0)}},
+        {{ sf::Vector2i(0,0)}}
+    }};
+
+    int m_changeIndex;
+    int m_figNum;
+    static constexpr std::array<int,7> m_nbPositionArray = {2,2,4,4,2,1};
+
+
 public:
     TetrisFigure(size_t side, sf::Color color,int bottomAbsIndex, int bottomOrdIndex, int bottomAbs, int bottomOrd,int figNum):Figure(side,color,bottomAbsIndex,bottomOrdIndex,bottomAbs,bottomOrd),m_changeIndex(0),m_figNum(figNum-1)
     {
@@ -385,45 +431,7 @@ public:
     }
 
 
-private:
 
-    static constexpr std::array<std::array<std::array<sf::Vector2i, 4>, 4>, 7> m_changeArray = {{
-        {{   
-            {{sf::Vector2i(0, 0), sf::Vector2i(0, -2), sf::Vector2i(2, 0), sf::Vector2i(0, 0)}},{{sf::Vector2i(0, 0), sf::Vector2i(0, 2), sf::Vector2i(-2, 0), sf::Vector2i(0, 0)}}   
-        }},
-        {{   
-            {{sf::Vector2i(0, 0), sf::Vector2i(1, 1), sf::Vector2i(-1, 2), sf::Vector2i(-2, 3)}},{{sf::Vector2i(0, 0), sf::Vector2i(-1, -1), sf::Vector2i(1, -2), sf::Vector2i(2, -3)}}   
-        }},
-        {{   
-            {{sf::Vector2i(0, 0), sf::Vector2i(-2, 0), sf::Vector2i(-2, 2), sf::Vector2i(0, 0)}},{{sf::Vector2i(0, -2), sf::Vector2i(1, 0), sf::Vector2i(1, 0), sf::Vector2i(0, -2)}},{{sf::Vector2i(-2, 1), sf::Vector2i(1, 0), sf::Vector2i(1, 0),sf::Vector2i(0, 1) }},{{sf::Vector2i(2, 1), sf::Vector2i(0, 0), sf::Vector2i(0, -2), sf::Vector2i(0, 1)}}      
-        }},
-        {{   
-            {{sf::Vector2i(1, 0), sf::Vector2i(2, -1), sf::Vector2i(0, 0), sf::Vector2i(0,0)}},{{sf::Vector2i(0, 0), sf::Vector2i(-1, 1), sf::Vector2i(-1, 1), sf::Vector2i(-1, 1)}}, {{sf::Vector2i(0, -1), sf::Vector2i(0,0), sf::Vector2i(1, -2), sf::Vector2i(0, 0)}},{{sf::Vector2i(-1, 1), sf::Vector2i(-1, 0), sf::Vector2i(0, 1), sf::Vector2i(1, -1)}}  
-        }},
-        {{   
-            {{sf::Vector2i(0,-1), sf::Vector2i(0, -1), sf::Vector2i(-1, 1), sf::Vector2i(-1, 1)}},{{sf::Vector2i(0, 0), sf::Vector2i(1, -1), sf::Vector2i(2, 0), sf::Vector2i(1, -1)}},{{sf::Vector2i(0, 0), sf::Vector2i(-1, 2), sf::Vector2i(0, 0), sf::Vector2i(-1, 2)}},{{sf::Vector2i(0, 1), sf::Vector2i(0, 0), sf::Vector2i(-1, -1), sf::Vector2i(1, -2)}}       
-        }},
-        {{   
-            {{sf::Vector2i(0, -2), sf::Vector2i(2, 0), sf::Vector2i(0, 0), sf::Vector2i(0, 0)}},{{sf::Vector2i(0, 2), sf::Vector2i(-2, 0), sf::Vector2i(0, 0), sf::Vector2i(0, 0)}}   
-        }},
-        {{   
-            {{sf::Vector2i(0, 0), sf::Vector2i(0, 0), sf::Vector2i(0, 0), sf::Vector2i(0, 0)}}   
-        }}
-    }};
-
-    static constexpr std::array<std::array<sf::Vector2i,4>,7> m_changeAbsArray = {{
-        {{ sf::Vector2i(1,0) , sf::Vector2i(-1,0)}},
-        {{ sf::Vector2i(-2,1) , sf::Vector2i(2,-1)}},
-        {{ sf::Vector2i(1,0) , sf::Vector2i(-1,-1), sf::Vector2i(1,1), sf::Vector2i(-1,0)}},
-        {{ sf::Vector2i(-1,0) , sf::Vector2i(1,0), sf::Vector2i(-1,0), sf::Vector2i(1,0)}},
-        {{ sf::Vector2i(1,0) , sf::Vector2i(-1,0), sf::Vector2i(1,0), sf::Vector2i(-1,0)}},
-        {{ sf::Vector2i(-1,0) , sf::Vector2i(1,0)}},
-        {{ sf::Vector2i(0,0)}}
-    }};
-
-    int m_changeIndex;
-    int m_figNum;
-    static constexpr std::array<int,7> m_nbPositionArray = {2,2,4,4,2,1};
 };
 
 
@@ -500,3 +508,4 @@ int main(){
     }
     return 0;
 }
+
