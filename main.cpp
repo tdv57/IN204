@@ -155,6 +155,16 @@ public:
 
     Figure(float side,sf::Color color,int bottomAbsIndex, int bottomOrdIndex,int bottomAbs,int bottomOrd):m_side(side),m_color(color),m_bottomAbsIndex(bottomAbsIndex),m_bottomOrdIndex(bottomOrdIndex),m_bottomAbs(bottomAbs),m_bottomOrd(bottomOrd){}
     
+    void goUp(){
+        int size = m_squaresIndex.size();
+        for(int i=0; i<size;i++){
+            m_squaresIndex[i].y -=1;
+            m_squaresVector[i].move(m_side * sf::Vector2f(0,-1));
+        }
+        m_bottomOrdIndex -=1;
+        m_topOrdIndex -=1;
+    }
+
     void goLeft(){
         int size = m_squaresIndex.size();
         for(int i=0 ; i<size;i++){
@@ -555,33 +565,31 @@ public:
     std::vector<std::vector<Square>> m_gameBoard = std::vector<std::vector<Square>>(22, std::vector<Square>(10));
 
     GameBoard(float initX,float initY,float side):m_nbRow(22),m_nbColumn(10),m_initX(initX),m_initY(initY),m_side(side),m_level(1),m_timeToGoDown(sf::milliseconds(1000)){
-        m_activFig = Generator::newTetrisFigure(m_side,5,1,m_initX+5*m_side,m_initY+0*m_side);
+        m_activFig = Generator::newTetrisFigure(m_side,5,1,m_initX+5*m_side,m_initY+1*m_side);
         m_rectangle.setFillColor(sf::Color::Black);
         m_rectangle.setPosition({m_initX-m_side/2.0f,m_initY-m_side/2.0f});
         m_rectangle.setSize({10*m_side,22*m_side});
     }
 
     void goDown(){
-        if(isBottomCollision()){
+        m_activFig->goDown();
+        if(isCollision()){
+            m_activFig->goUp();
             collision();
-            return;
         }
-        m_activFig -> goDown();
     }
 
     void goLeft(){
-        std::cout << "Indice avant left move" << m_activFig->getLeftAbsIndex() << std::endl;
-        if(!isLeftCollision()){
-            m_activFig -> goLeft();
-            std::cout << "Indice apres left move" << m_activFig->getLeftAbsIndex() << std::endl;
+        m_activFig->goLeft();
+        if(isCollision()){
+            m_activFig->goRight();
         }
     }
 
     void goRight(){
-        std::cout << "Indice avant left move" << m_activFig->getRightAbsIndex() << std::endl;
-        if(!isRightCollision()){
-            m_activFig-> goRight();
-            std::cout << "Indice apres left move" << m_activFig->getRightAbsIndex() << std::endl;
+        m_activFig->goRight();
+        if(isCollision()){
+            m_activFig-> goLeft();
         }
     }
 
@@ -615,48 +623,19 @@ private:
             m_isSquare[SquaresIndex[i].y][SquaresIndex[i].x] = 1;
         }
         m_activFig.reset();
-        m_activFig = Generator::newTetrisFigure(m_side,5,1,m_initX+5*m_side,m_initY+0*m_side);
+        m_activFig = Generator::newTetrisFigure(m_side,5,1,m_initX+5*m_side,m_initY+1*m_side);
     }
 
 
-    bool isBottomCollision(){
-        if(m_activFig->getBottomOrdIndex()>=21){
-            return true;
-        }
-        auto SquaresIndex = m_activFig -> getSquaresIndex();
-        for(int i=0;i<SquaresIndex.size();i++){
-            if(SquaresIndex[i].y>=0){
-                if(m_isSquare[SquaresIndex[i].y+1][SquaresIndex[i].x]!=0){
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    bool isLeftCollision(){
-        if(m_activFig->getLeftAbsIndex()<=0){
-            return true;
-        }
-        auto SquaresIndex = m_activFig -> getSquaresIndex();
-        for(int i=0;i<SquaresIndex.size();i++){
-            if(SquaresIndex[i].y>=0){
-                if(m_isSquare[SquaresIndex[i].y][SquaresIndex[i].x-1]!=0){
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    bool isRightCollision(){
-        if(m_activFig->getRightAbsIndex()>=9){
+    bool isCollision(){
+        std::cout << m_activFig->getBottomOrdIndex() << std::endl;
+        if(m_activFig->getRightAbsIndex()>9 || m_activFig->getLeftAbsIndex()<0 || m_activFig->getBottomOrdIndex()>21){
             return true;
         }
         auto SquaresIndex = m_activFig-> getSquaresIndex();
         for(int i=0 ; i<SquaresIndex.size();i++){
             if(SquaresIndex[i].y>=0){
-                if(m_isSquare[SquaresIndex[i].y][SquaresIndex[i].x+1]!=0){
+                if(m_isSquare[SquaresIndex[i].y][SquaresIndex[i].x]!=0){
                     return true;
                 }
             }
