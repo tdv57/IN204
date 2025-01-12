@@ -633,39 +633,6 @@ public:
 
 private:
 
-
-    void updateScore(std::vector<int> vec){
-        if(vec.size()==1){
-            m_score+=40*(m_level+1);
-        }
-        else if(vec.size()==2){
-            m_score+=100*(m_level+1);
-        }
-        else if(vec.size()==3){
-            m_score +=300*(m_level+1);
-        }
-        else if(vec.size()==4){
-            m_score+=1200*(m_level+1);
-        }
-
-    }
-
-    void updateLevel(){
-        if (m_score>= 500 + 500*(m_level+1)*m_level/2){
-            m_level++;
-            updateTimerToGoDown();
-        }
-    }
-
-    void updateTimerToGoDown(){
-        if(m_level!=0){
-            m_timeToGoDown = m_timeToGoDown - sf::seconds(0.9 * (m_level-1)/m_level);
-        }
-        else{
-            m_timeToGoDown = m_timeToGoDown-sf::seconds(0.9);
-        }
-       
-    }
     bool completedRow(int row){
         for(int j=0;j<10;j++){
             if(m_isSquare[row][j]==0){
@@ -729,29 +696,17 @@ private:
 
     void collision(){
         auto SquaresIndex = m_activFig->getSquaresIndex();
-        if(m_activFig->getTopOrdIndex()<0){
-            m_gameEnded =true;
+        for(int i=0 ; i <SquaresIndex.size();i++){
+            m_gameBoard[SquaresIndex[i].y][SquaresIndex[i].x]= Square(m_side,m_activFig->getColor(),m_initX + SquaresIndex[i].x*m_side , m_initY + SquaresIndex[i].y*m_side  );
+            m_isSquare[SquaresIndex[i].y][SquaresIndex[i].x] = 1;
         }
-        if(!m_gameEnded){
-            for(int i=0 ; i <SquaresIndex.size();i++){
-                m_gameBoard[SquaresIndex[i].y][SquaresIndex[i].x]= Square(m_side,m_activFig->getColor(),m_initX + SquaresIndex[i].x*m_side , m_initY + SquaresIndex[i].y*m_side  );
-                m_isSquare[SquaresIndex[i].y][SquaresIndex[i].x] = 1;
-            }
-            std::vector<int> rowCompleted = getCompletedRow();
-            if(rowCompleted.size()>0){
-                erase(rowCompleted);
-                int nonEmptyRow = internSwap(rowCompleted);
-                restingSwap(rowCompleted,nonEmptyRow);
-            }
-                m_activFig.reset();
-                m_activFig = Generator::newTetrisFigure(m_side,5,1,m_initX+5*m_side,m_initY+1*m_side);
-        }
+        m_activFig.reset();
+        m_activFig = Generator::newTetrisFigure(m_side,5,1,m_initX+5*m_side,m_initY+1*m_side);
     }
 
 
-
-
     bool isCollision(){
+        std::cout << m_activFig->getBottomOrdIndex() << std::endl;
         if(m_activFig->getRightAbsIndex()>9 || m_activFig->getLeftAbsIndex()<0 || m_activFig->getBottomOrdIndex()>21){
             return true;
         }
@@ -768,38 +723,158 @@ private:
 
     bool isLeftRotationCollision(){
         m_activFig->rotateLeft();
-        if(isCollision()){
+        if(m_activFig->getLeftAbsIndex()<0){
             m_activFig->goRight();
-            if(isCollision()){
+            if(m_activFig->getLeftAbsIndex()<0){
                 m_activFig->goRight();
-                if(isCollision()){
-                    m_activFig->goLeft();
-                    m_activFig->goLeft();
-                    m_activFig->rotateRight();
-                    return true;
+                auto SquaresIndex = m_activFig->getSquaresIndex();
+                for(int i=0 ; i<SquaresIndex.size();i++){
+                    if(SquaresIndex[i].y>=0){
+                        if(m_isSquare[SquaresIndex[i].y][SquaresIndex[i].x]!=0){
+                            m_activFig -> goLeft();
+                            m_activFig -> goLeft();
+                            m_activFig -> rotateRight();
+                            return true;
+                        }
+                    }
                 }
+                return false;
+            }
+            else{
+                auto SquaresIndex = m_activFig->getSquaresIndex();
+                for(int i=0 ;i<SquaresIndex.size();i++){
+                    if(SquaresIndex[i].y>=0){
+                        if(m_isSquare[SquaresIndex[i].y][SquaresIndex[i].x]!=0){
+                            m_activFig->goRight();
+                            SquaresIndex = m_activFig->getSquaresIndex();
+                            for(int j=0;j<SquaresIndex.size();j++){
+                                if(SquaresIndex[j].y>=0){
+                                    if(m_isSquare[SquaresIndex[j].y][SquaresIndex[j].x]!=0){
+                                        m_activFig->goLeft();
+                                        m_activFig->goLeft();
+                                        m_activFig->rotateRight();
+                                        return false;
+                                    }
+                                }
+                            }
+                        }
+                    }                    
+                }
+                return true;
             }
         }
-        return false;
+        else{
+            auto SquaresIndex = m_activFig->getSquaresIndex();
+            for(int i=0; i <SquaresIndex.size();i++){
+                if(SquaresIndex[i].y>=0){
+                    if(m_isSquare[SquaresIndex[i].y][SquaresIndex[i].x]!=0){
+                        m_activFig->goRight();
+                        SquaresIndex = m_activFig->getSquaresIndex();
+                        for(int j=0; j <SquaresIndex.size();j++){
+                            if(SquaresIndex[j].y>=0){
+                                if(m_isSquare[SquaresIndex[j].y][SquaresIndex[j].x]!=0){
+                                    m_activFig->goRight();
+                                    SquaresIndex = m_activFig->getSquaresIndex();
+                                    for(int l=0;l<SquaresIndex.size();l++){
+                                        if(SquaresIndex[l].y>=0){
+                                            if(m_isSquare[SquaresIndex[l].y][SquaresIndex[l].x]!=0){
+                                                m_activFig->goLeft();
+                                                m_activFig->goLeft();
+                                                m_activFig->rotateRight();
+                                                return true;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        return false;
+                    }
+                }
+            }
+            return false;
+        }   
     }
+
+
 
 
     bool isRightRotationCollision(){
         m_activFig->rotateRight();
-        if(isCollision()){
+        if(m_activFig->getLeftAbsIndex()<0){
             m_activFig->goRight();
-            if(isCollision()){
+            if(m_activFig->getLeftAbsIndex()<0){
                 m_activFig->goRight();
-                if(isCollision()){
-                    m_activFig->goLeft();
-                    m_activFig->goLeft();
-                    m_activFig->rotateLeft();
-                    return true;
+                auto SquaresIndex = m_activFig->getSquaresIndex();
+                for(int i=0 ; i<SquaresIndex.size();i++){
+                    if(SquaresIndex[i].y>=0){
+                        if(m_isSquare[SquaresIndex[i].y][SquaresIndex[i].x]!=0){
+                            m_activFig -> goLeft();
+                            m_activFig -> goLeft();
+                            m_activFig -> rotateRight();
+                            return true;
+                        }
+                    }
                 }
+                return false;
+            }
+            else{
+                auto SquaresIndex = m_activFig->getSquaresIndex();
+                for(int i=0 ;i<SquaresIndex.size();i++){
+                    if(SquaresIndex[i].y>=0){
+                        if(m_isSquare[SquaresIndex[i].y][SquaresIndex[i].x]!=0){
+                            m_activFig->goRight();
+                            SquaresIndex = m_activFig->getSquaresIndex();
+                            for(int j=0;j<SquaresIndex.size();j++){
+                                if(SquaresIndex[j].y>=0){
+                                    if(m_isSquare[SquaresIndex[j].y][SquaresIndex[j].x]!=0){
+                                        m_activFig->goLeft();
+                                        m_activFig->goLeft();
+                                        m_activFig->rotateRight();
+                                        return false;
+                                    }
+                                }
+                            }
+                        }
+                    }                    
+                }
+                return true;
             }
         }
-        return false;
+        else{
+            auto SquaresIndex = m_activFig->getSquaresIndex();
+            for(int i=0; i <SquaresIndex.size();i++){
+                if(SquaresIndex[i].y>=0){
+                    if(m_isSquare[SquaresIndex[i].y][SquaresIndex[i].x]!=0){
+                        m_activFig->goRight();
+                        SquaresIndex = m_activFig->getSquaresIndex();
+                        for(int j=0; j <SquaresIndex.size();j++){
+                            if(SquaresIndex[j].y>=0){
+                                if(m_isSquare[SquaresIndex[j].y][SquaresIndex[j].x]!=0){
+                                    m_activFig->goRight();
+                                    SquaresIndex = m_activFig->getSquaresIndex();
+                                    for(int l=0;l<SquaresIndex.size();l++){
+                                        if(SquaresIndex[l].y>=0){
+                                            if(m_isSquare[SquaresIndex[l].y][SquaresIndex[l].x]!=0){
+                                                m_activFig->goLeft();
+                                                m_activFig->goLeft();
+                                                m_activFig->rotateRight();
+                                                return true;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        return false;
+                    }
+                }
+            }
+            return false;
+        }   
     }
+
+
 
 
 };
@@ -827,35 +902,37 @@ int main(){
             else if(const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()){
                 if (keyPressed->scancode == sf::Keyboard::Scancode::Escape) window.close();
             }
-            if(!gameboard.gameEnded()){
-                if(const auto* UpKey = event->getIf<sf::Event::KeyPressed>()){
-                    if(UpKey->scancode == sf::Keyboard::Scancode::Down){
-                        gameboard.goDown();
-                        //fig.goDown();
-                    }
-                    if(UpKey->scancode == sf::Keyboard::Scancode::Left){
-                        gameboard.goLeft();
-                        //fig.goLeft();
-                    }
-                    if(UpKey->scancode == sf::Keyboard::Scancode::Right){
-                        gameboard.goRight();
-                        //fig.goRight();
-                    }
-                    if(UpKey->scancode == sf::Keyboard::Scancode::H){
-                        gameboard.rotateLeft();
-                        // fig.rotateLeft();
-                    }
-                    if(UpKey->scancode == sf::Keyboard::Scancode::J){
-                        gameboard.rotateRight();
-                        // fig.rotateRight();
-                    }
-                }               
+
+            if(const auto* UpKey = event->getIf<sf::Event::KeyPressed>()){
+                if(UpKey->scancode == sf::Keyboard::Scancode::Down){
+                    gameboard.goDown();
+                    //fig.goDown();
+                }
+                if(UpKey->scancode == sf::Keyboard::Scancode::Left){
+                    gameboard.goLeft();
+                    //fig.goLeft();
+                }
+                if(UpKey->scancode == sf::Keyboard::Scancode::Right){
+                    gameboard.goRight();
+                    //fig.goRight();
+                }
+                if(UpKey->scancode == sf::Keyboard::Scancode::H){
+                    gameboard.rotateLeft();
+                    // fig.rotateLeft();
+                    // std::cout << fig.getLeftAbsIndex() << std::endl;
+                    // std::cout << fig.getRightAbsIndex() << std::endl;
+                    // std::cout << fig.getTopOrdIndex() << std::endl;
+                    // std::cout << fig.getBottomOrdIndex() << std::endl;
+                }
+                if(UpKey->scancode == sf::Keyboard::Scancode::J){
+                    gameboard.rotateRight();
+                    // fig.rotateRight();
+                    // std::cout << fig.getLeftAbsIndex() << std::endl;
+                    // std::cout << fig.getRightAbsIndex() << std::endl;
+                    // std::cout << fig.getTopOrdIndex() << std::endl;
+                    // std::cout << fig.getBottomOrdIndex() << std::endl;
+                }
             }
-
-        }
-
-        if(!gameboard.gameEnded()){
-            gameboard.autoGoDown();
         }
 
         window.clear();
@@ -866,4 +943,5 @@ int main(){
     }
     return 0;
 }
+
 
