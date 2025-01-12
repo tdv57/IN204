@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cmath>
 #include <memory>
+#include <vector>
 
 
 /******************************************************************************************************************************************** */
@@ -12,20 +13,34 @@
 /******************************************************************************************************************************************** */
 /******************************************************************************************************************************************** */
 
+class Generator;
 
-sf::Vector2i operator * (const size_t& side,const sf::Vector2i v){
+class TetrisColor{
+public:
+    static constexpr sf::Color Orange = sf::Color(255,165,0);
+    static constexpr sf::Color Black = sf::Color::Black;
+    static constexpr sf::Color Magenta = sf::Color::Magenta;
+    static constexpr sf::Color Red = sf::Color::Red;
+    static constexpr sf::Color Yellow = sf::Color::Yellow;
+    static constexpr sf::Color Green = sf::Color::Green;
+    static constexpr sf::Color Cyan = sf::Color::Cyan;
+    static constexpr sf::Color Blue = sf::Color::Blue;
+};
+
+
+sf::Vector2i operator * (const float& side,const sf::Vector2i v){
     return sf::Vector2i(side*v.x,side*v.y);
 }
 
-sf::Vector2f operator * (const size_t& side,const sf::Vector2f v){
+sf::Vector2f operator * (const float& side,const sf::Vector2f v){
     return sf::Vector2f(side*v.x,side*v.y);
 }
 
-sf::Vector2i operator * (const sf::Vector2i v,const size_t& side){
+sf::Vector2i operator * (const sf::Vector2i v,const float& side){
     return sf::Vector2i(side*v.x,side*v.y);
 }
 
-sf::Vector2f operator * (const sf::Vector2f v,const size_t& side){
+sf::Vector2f operator * (const sf::Vector2f v,const float& side){
     return sf::Vector2f(side*v.x,side*v.y);
 }
 
@@ -34,9 +49,9 @@ class Square: public sf::Drawable, public sf::Transformable {
 
 private:
     sf::VertexArray m_vertices;
-    size_t m_side;
-    size_t m_initX;
-    size_t m_initY;
+    float m_side;
+    float m_initX;
+    float m_initY;
     sf::Color m_color;
 
 
@@ -45,7 +60,7 @@ public:
     Square():m_side(0){}
 
 
-    Square(size_t newSide, sf::Color newcolor = sf::Color::Black, size_t newinitX = 0,size_t newinitY=0): m_side(newSide),m_color(newcolor),m_initX(newinitX),m_initY(newinitY)
+    Square(float newSide, sf::Color newcolor = sf::Color::Black, float newinitX = 0,float newinitY=0): m_side(newSide),m_color(newcolor),m_initX(newinitX),m_initY(newinitY)
     {
         m_vertices.setPrimitiveType(sf::PrimitiveType::TriangleStrip);
         m_vertices.resize(4);
@@ -65,8 +80,15 @@ public:
     }
 
 
+    float getNewInitX() const{
+        return m_initX;
+    }
 
-    size_t getSide()const{
+    float getNewInitY() const{
+        return m_initY;
+    }
+
+    float getSide()const{
         return m_side;
     }
 
@@ -115,7 +137,7 @@ class Figure {
 protected:
 
     sf::Color m_color;
-    size_t m_side;
+    float m_side;
     std::vector<Square> m_squaresVector; // Je crois qu'on en a pas besoin
     std::vector<sf::Vector2i> m_squaresIndex;
     int m_bottomAbsIndex;
@@ -131,7 +153,7 @@ protected:
 
 public:
 
-    Figure(size_t side,sf::Color color,int bottomAbsIndex, int bottomOrdIndex,int bottomAbs,int bottomOrd):m_side(side),m_color(color),m_bottomAbsIndex(bottomAbsIndex),m_bottomOrdIndex(bottomOrdIndex),m_bottomAbs(bottomAbs),m_bottomOrd(bottomOrd){}
+    Figure(float side,sf::Color color,int bottomAbsIndex, int bottomOrdIndex,int bottomAbs,int bottomOrd):m_side(side),m_color(color),m_bottomAbsIndex(bottomAbsIndex),m_bottomOrdIndex(bottomOrdIndex),m_bottomAbs(bottomAbs),m_bottomOrd(bottomOrd){}
     
     void goLeft(){
         int size = m_squaresIndex.size();
@@ -199,6 +221,10 @@ public:
 
     int getBottomOrdIndex() const{
         return m_bottomOrdIndex;
+    }
+
+    int getBottomAbs() const{
+        return m_bottomAbs;
     }
 
     int getLeftAbsIndex() const{
@@ -278,17 +304,17 @@ private:
         // Figure ->  2
         //            1
         //           30
-        {{ sf::Vector3i(1,0,1) , sf::Vector3i(-1,-1,-1), sf::Vector3i(1,1,1), sf::Vector3i(-1,0,-1)}},
+        {{ sf::Vector3i(-1,0,1) , sf::Vector3i(1,0,-1), sf::Vector3i(-1,0,1), sf::Vector3i(1,0,-1)}},
         // Figure -> 123
         //            0
-        {{ sf::Vector3i(-1,0,-1) , sf::Vector3i(1,0,1), sf::Vector3i(-1,0,-1), sf::Vector3i(1,0,1)}},
+        {{ sf::Vector3i(1,0,-1) , sf::Vector3i(-1,0,1), sf::Vector3i(1,0,-1), sf::Vector3i(-1,0,1)}},
         // Figure -> 3
         //           2
         //           10
-        {{ sf::Vector3i(1,0,1) , sf::Vector3i(-1,0,-1), sf::Vector3i(1,0,1), sf::Vector3i(-1,0,-1)}},
+        {{ sf::Vector3i(-1,0,1) , sf::Vector3i(1,0,-1), sf::Vector3i(-1,0,1), sf::Vector3i(1,0,-1)}},
         // Figure ->  32
         //           10
-        {{ sf::Vector3i(-1,0,-1) , sf::Vector3i(1,0,1)}},
+        {{ sf::Vector3i(1,0,-1) , sf::Vector3i(-1,0,1)}},
         // Figure -> 32
         //           10
         {{ sf::Vector3i(0,0,0)}}
@@ -296,11 +322,11 @@ private:
 
     int m_changeIndex;
     int m_figNum;
-    static constexpr std::array<int,7> m_nbPositionArray = {2,2,4,4,2,1};
+    static constexpr std::array<int,7> m_nbPositionArray = {2,2,4,4,4,2,1};
 
 
 public:
-    TetrisFigure(size_t side, sf::Color color,int bottomAbsIndex, int bottomOrdIndex, int bottomAbs, int bottomOrd,int figNum):Figure(side,color,bottomAbsIndex,bottomOrdIndex,bottomAbs,bottomOrd),m_changeIndex(0),m_figNum(figNum-1)
+    TetrisFigure(float side, sf::Color color,int bottomAbsIndex, int bottomOrdIndex, int bottomAbs, int bottomOrd,int figNum):Figure(side,color,bottomAbsIndex,bottomOrdIndex,bottomAbs,bottomOrd),m_changeIndex(0),m_figNum(figNum-1)
     {
         if(figNum==1){
             // Je rajoute squaresIndex
@@ -336,8 +362,8 @@ public:
             setSquares();
             
             m_topOrdIndex = bottomOrdIndex-2;
-            m_leftAbsIndex = bottomAbsIndex;
-            m_rightAbsIndex = bottomAbsIndex+1;           
+            m_leftAbsIndex = bottomAbsIndex-1;
+            m_rightAbsIndex = bottomAbsIndex;           
         }
         else if(figNum==4){
             // Je rajoute squaresIndex
@@ -407,7 +433,7 @@ public:
     void increaseChangeIndex(){
         m_changeIndex++;
         m_changeIndex = m_changeIndex%m_nbPositionArray[m_figNum];
-    }
+        }
 
     void setChangeIndex(int n){
         if(n>=0 && n<=m_nbPositionArray[m_figNum]-1){
@@ -427,9 +453,11 @@ public:
         return m_changeAbsArray[m_figNum];
     }
 
+    int getTopOrdIndex() const{
+        return m_topOrdIndex;
+    }
 
     void rotateLeft() {
-
         int size = getNbSquares();
         int changeIndex = getChangeIndex();
         auto changeArray = getChangeArray();
@@ -437,11 +465,9 @@ public:
             m_squaresIndex[i] += changeArray[changeIndex][i];
             m_squaresVector[i].move(m_side *static_cast<sf::Vector2f> (changeArray[changeIndex][i]));
         }
-
         auto changeAbsArray = getChangeAbsArray();
         m_leftAbsIndex +=  changeAbsArray[changeIndex].x;
         m_rightAbsIndex += changeAbsArray[changeIndex].y;
-
         increaseChangeIndex();
 
     }
@@ -465,154 +491,12 @@ public:
 };
 
 
-class GameBoard{
-    // vector<std::array<Square,11>
-    // 22 longueurs 10 largeurs // Il faut des cases en plus invisibles pour charger l'objet   
-private:
-
-    
-    size_t m_nbRow;
-    size_t m_nbColumn;
-    size_t m_initX;
-    size_t m_initY;
-    size_t m_side;
-    unsigned int m_level;
-    std::shared_ptr<TetrisFigure> m_activFig;
-    
-    // Ou alors std::array<std::array<Square,10>,23> tableau_m (j'ai mis 23 car on aura deux case à cacher); 
-    // ON va lui mettre un std::vector de figure (des pointeurs) 
-
-
-public:
-
-    std::vector<std::vector<Square>> m_gameBoard;
-
-
-    GameBoard(size_t nbRow,size_t nbColumn,size_t initX,size_t initY,size_t side):m_nbRow(nbRow),m_nbColumn(nbColumn),m_initX(initX),m_initY(initY),m_side(side),m_level(0){
-        m_gameBoard.resize(m_nbRow, std::vector<Square>(m_nbColumn, Square(m_side))); 
-             
-    }
-
-    bool goDown(){
-        if(!isBottomCollision()){
-            m_activFig->goDown();
-            return true;
-        }
-        collision();
-        return false;
-    }
-
-    bool goLeft(){
-        if(!isLeftCollision()){
-            m_activFig->goLeft();
-            return true;
-        }
-        return false;
-    }
-
-    bool goRight(){
-        if(!isRightCollision()){
-            m_activFig->goRight();
-            return true;
-        }
-        return false;
-    }
-
-    sf::Vector2f getInit() const{
-        return sf::Vector2f(m_initX,m_initY);
-    }
-
-    unsigned int getLevel() const{
-        return m_level;
-    }
-
-    void draw(sf::RenderWindow& window ){
-        for(int i=0;i<m_nbRow;i++){
-            for(int j=0;j<m_nbRow;j++){
-                window.draw(m_gameBoard[i][j]);
-            }
-        }
-        m_activFig->draw(window);
-    }
-
-    
-
-private:
-
-    bool isBottomCollision(){
-        int bottomOrdIndex = m_activFig->getBottomOrdIndex();
-        if(bottomOrdIndex == m_nbRow-1){
-            return true;
-        }
-        auto squaresIndex = m_activFig->getSquaresIndex();
-        for(int i=0; i<squaresIndex.size(); i++){
-            if(squaresIndex[i].y==bottomOrdIndex  && m_gameBoard[squaresIndex[i].x][squaresIndex[i].y+1] != Square(m_side)  ){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    bool isLeftCollision(){
-        int leftAbsIndex = m_activFig->getLeftAbsIndex();
-        if(leftAbsIndex <= 0){
-            return true;
-        }
-        auto squaresIndex = m_activFig->getSquaresIndex();
-        for(int i=0;i<squaresIndex.size();i++){
-            if(squaresIndex[i].x==leftAbsIndex  && m_gameBoard[squaresIndex[i].x-1][squaresIndex[i].y] != Square(m_side)  ){
-                return true;
-            }
-        }
-        return false;            
-    }
-
-    bool isRightCollision(){
-        int rightAbsIndex = m_activFig->getRightAbsIndex();
-        if(rightAbsIndex >= m_nbColumn-1){
-            return true;
-        }
-        auto squaresIndex = m_activFig->getSquaresIndex();
-        for(int i=0;i<squaresIndex.size();i++){
-            if(squaresIndex[i].x==rightAbsIndex  && m_gameBoard[squaresIndex[i].x+1][squaresIndex[i].y] != Square(m_side)  ){
-                return true;
-            }
-        }
-        return false;            
-    }
-
-
-    void collision(){
-        auto squaresIndex = m_activFig->getSquaresIndex();
-        for(int i=0 ; i<squaresIndex.size();i++){
-            m_gameBoard[squaresIndex[i].x][squaresIndex[i].y] = Square(m_side,m_activFig->getColor(),m_initX + squaresIndex[i].x*m_side , m_initY + squaresIndex[i].y*m_side  );
-        }
-
-        m_activFig.reset();
-    }
-
-
-
-};
-
-class TetrisColor{
-public:
-    static constexpr sf::Color Orange = sf::Color(255,165,0);
-    static constexpr sf::Color Black = sf::Color::Black;
-    static constexpr sf::Color Magenta = sf::Color::Magenta;
-    static constexpr sf::Color Red = sf::Color::Red;
-    static constexpr sf::Color Yellow = sf::Color::Yellow;
-    static constexpr sf::Color Green = sf::Color::Green;
-    static constexpr sf::Color Cyan = sf::Color::Cyan;
-    static constexpr sf::Color Blue = sf::Color::Blue;
-};
-
 class Generator{
 
 static constexpr std::array<sf::Color,7> m_tetrisColor = { TetrisColor::Yellow , TetrisColor::Blue, TetrisColor::Red , TetrisColor::Magenta , TetrisColor::Green,TetrisColor::Orange,TetrisColor::Cyan};
 public:
 
-std::shared_ptr<TetrisFigure> newTetrisFigure(int side,int bottomAbsIndex,int bottomOrdIndex,int bottomAbs, int bottomOrd){
+static std::shared_ptr<TetrisFigure> newTetrisFigure(int side,int bottomAbsIndex,int bottomOrdIndex,int bottomAbs, int bottomOrd){
     int figNum = 1 + (std::rand() % 7);
     sf::Color color = m_tetrisColor[std::rand()%7];
     return std::make_shared<TetrisFigure>(side,color,bottomAbsIndex,bottomOrdIndex,bottomAbs,bottomOrd,figNum);
@@ -620,23 +504,338 @@ std::shared_ptr<TetrisFigure> newTetrisFigure(int side,int bottomAbsIndex,int bo
  // Le générateur de figure 
 };
 
+
+class GameBoard{
+    // vector<std::array<Square,11>
+    // 22 longueurs 10 largeurs // Il faut des cases en plus invisibles pour charger l'objet   
+private:
+
+    
+    int m_nbRow=22;
+    int m_nbColumn=10;
+    float m_initX;
+    float m_initY;
+    float m_side;
+    unsigned int m_level;
+    unsigned int m_score;
+    sf::Clock m_timerToGoDown;
+    sf::Time m_timeToGoDown;
+    std::shared_ptr<TetrisFigure> m_activFig;
+    sf::RectangleShape m_rectangle;
+    // Ou alors std::array<std::array<Square,10>,23> tableau_m (j'ai mis 23 car on aura deux case à cacher); 
+    // ON va lui mettre un std::vector de figure (des pointeurs) 
+    
+    
+    std::array<std::array<int,10>,22> m_isSquare = {{
+        {0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0},
+    }};
+
+public:
+    std::vector<std::vector<Square>> m_gameBoard = std::vector<std::vector<Square>>(22, std::vector<Square>(10));
+
+    GameBoard(float initX,float initY,float side):m_nbRow(22),m_nbColumn(10),m_initX(initX),m_initY(initY),m_side(side),m_level(1),m_timeToGoDown(sf::milliseconds(1000)){
+        m_activFig = Generator::newTetrisFigure(m_side,5,1,m_initX+5*m_side,m_initY+0*m_side);
+        m_rectangle.setFillColor(sf::Color::Black);
+        m_rectangle.setPosition({m_initX-m_side/2.0f,m_initY-m_side/2.0f});
+        m_rectangle.setSize({10*m_side,22*m_side});
+    }
+
+    void goDown(){
+        if(isBottomCollision()){
+            collision();
+            return;
+        }
+        m_activFig -> goDown();
+    }
+
+    void goLeft(){
+        std::cout << "Indice avant left move" << m_activFig->getLeftAbsIndex() << std::endl;
+        if(!isLeftCollision()){
+            m_activFig -> goLeft();
+            std::cout << "Indice apres left move" << m_activFig->getLeftAbsIndex() << std::endl;
+        }
+    }
+
+    void goRight(){
+        std::cout << "Indice avant left move" << m_activFig->getRightAbsIndex() << std::endl;
+        if(!isRightCollision()){
+            m_activFig-> goRight();
+            std::cout << "Indice apres left move" << m_activFig->getRightAbsIndex() << std::endl;
+        }
+    }
+
+    void rotateLeft(){
+        isLeftRotationCollision();
+    }
+
+    void rotateRight(){
+        isRightRotationCollision();
+    }
+
+    void draw(sf::RenderWindow& window){
+        window.draw(m_rectangle);
+        for(int j=0;j<22;j++){
+            for(int i=0 ;i<10;i++){
+                if(m_isSquare[j][i]!=0){
+                    window.draw(m_gameBoard[j][i]);
+                }
+            }
+        }
+        m_activFig->draw(window);
+    }
+
+private:
+
+
+    void collision(){
+        auto SquaresIndex = m_activFig->getSquaresIndex();
+        for(int i=0 ; i <SquaresIndex.size();i++){
+            m_gameBoard[SquaresIndex[i].y][SquaresIndex[i].x]= Square(m_side,m_activFig->getColor(),m_initX + SquaresIndex[i].x*m_side , m_initY + SquaresIndex[i].y*m_side  );
+            m_isSquare[SquaresIndex[i].y][SquaresIndex[i].x] = 1;
+        }
+        m_activFig.reset();
+        m_activFig = Generator::newTetrisFigure(m_side,5,1,m_initX+5*m_side,m_initY+0*m_side);
+    }
+
+
+    bool isBottomCollision(){
+        if(m_activFig->getBottomOrdIndex()>=21){
+            return true;
+        }
+        auto SquaresIndex = m_activFig -> getSquaresIndex();
+        for(int i=0;i<SquaresIndex.size();i++){
+            if(SquaresIndex[i].y>=0){
+                if(m_isSquare[SquaresIndex[i].y+1][SquaresIndex[i].x]!=0){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    bool isLeftCollision(){
+        if(m_activFig->getLeftAbsIndex()<=0){
+            return true;
+        }
+        auto SquaresIndex = m_activFig -> getSquaresIndex();
+        for(int i=0;i<SquaresIndex.size();i++){
+            if(SquaresIndex[i].y>=0){
+                if(m_isSquare[SquaresIndex[i].y][SquaresIndex[i].x-1]!=0){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    bool isRightCollision(){
+        if(m_activFig->getRightAbsIndex()>=9){
+            return true;
+        }
+        auto SquaresIndex = m_activFig-> getSquaresIndex();
+        for(int i=0 ; i<SquaresIndex.size();i++){
+            if(SquaresIndex[i].y>=0){
+                if(m_isSquare[SquaresIndex[i].y][SquaresIndex[i].x+1]!=0){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    bool isLeftRotationCollision(){
+        m_activFig->rotateLeft();
+        if(m_activFig->getLeftAbsIndex()<0){
+            m_activFig->goRight();
+            if(m_activFig->getLeftAbsIndex()<0){
+                m_activFig->goRight();
+                auto SquaresIndex = m_activFig->getSquaresIndex();
+                for(int i=0 ; i<SquaresIndex.size();i++){
+                    if(SquaresIndex[i].y>=0){
+                        if(m_isSquare[SquaresIndex[i].y][SquaresIndex[i].x]!=0){
+                            m_activFig -> goLeft();
+                            m_activFig -> goLeft();
+                            m_activFig -> rotateRight();
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+            else{
+                auto SquaresIndex = m_activFig->getSquaresIndex();
+                for(int i=0 ;i<SquaresIndex.size();i++){
+                    if(SquaresIndex[i].y>=0){
+                        if(m_isSquare[SquaresIndex[i].y][SquaresIndex[i].x]!=0){
+                            m_activFig->goRight();
+                            SquaresIndex = m_activFig->getSquaresIndex();
+                            for(int j=0;j<SquaresIndex.size();j++){
+                                if(SquaresIndex[j].y>=0){
+                                    if(m_isSquare[SquaresIndex[j].y][SquaresIndex[j].x]!=0){
+                                        m_activFig->goLeft();
+                                        m_activFig->goLeft();
+                                        m_activFig->rotateRight();
+                                        return false;
+                                    }
+                                }
+                            }
+                        }
+                    }                    
+                }
+                return true;
+            }
+        }
+        else{
+            auto SquaresIndex = m_activFig->getSquaresIndex();
+            for(int i=0; i <SquaresIndex.size();i++){
+                if(SquaresIndex[i].y>=0){
+                    if(m_isSquare[SquaresIndex[i].y][SquaresIndex[i].x]!=0){
+                        m_activFig->goRight();
+                        SquaresIndex = m_activFig->getSquaresIndex();
+                        for(int j=0; j <SquaresIndex.size();j++){
+                            if(SquaresIndex[j].y>=0){
+                                if(m_isSquare[SquaresIndex[j].y][SquaresIndex[j].x]!=0){
+                                    m_activFig->goRight();
+                                    SquaresIndex = m_activFig->getSquaresIndex();
+                                    for(int l=0;l<SquaresIndex.size();l++){
+                                        if(SquaresIndex[l].y>=0){
+                                            if(m_isSquare[SquaresIndex[l].y][SquaresIndex[l].x]!=0){
+                                                m_activFig->goLeft();
+                                                m_activFig->goLeft();
+                                                m_activFig->rotateRight();
+                                                return true;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        return false;
+                    }
+                }
+            }
+            return false;
+        }   
+    }
+
+
+    bool isRightRotationCollision(){
+        m_activFig->rotateRight();
+        if(m_activFig->getLeftAbsIndex()<0){
+            m_activFig->goRight();
+            if(m_activFig->getLeftAbsIndex()<0){
+                m_activFig->goRight();
+                auto SquaresIndex = m_activFig->getSquaresIndex();
+                for(int i=0 ; i<SquaresIndex.size();i++){
+                    if(SquaresIndex[i].y>=0){
+                        if(m_isSquare[SquaresIndex[i].y][SquaresIndex[i].x]!=0){
+                            m_activFig -> goLeft();
+                            m_activFig -> goLeft();
+                            m_activFig -> rotateRight();
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+            else{
+                auto SquaresIndex = m_activFig->getSquaresIndex();
+                for(int i=0 ;i<SquaresIndex.size();i++){
+                    if(SquaresIndex[i].y>=0){
+                        if(m_isSquare[SquaresIndex[i].y][SquaresIndex[i].x]!=0){
+                            m_activFig->goRight();
+                            SquaresIndex = m_activFig->getSquaresIndex();
+                            for(int j=0;j<SquaresIndex.size();j++){
+                                if(SquaresIndex[j].y>=0){
+                                    if(m_isSquare[SquaresIndex[j].y][SquaresIndex[j].x]!=0){
+                                        m_activFig->goLeft();
+                                        m_activFig->goLeft();
+                                        m_activFig->rotateRight();
+                                        return false;
+                                    }
+                                }
+                            }
+                        }
+                    }                    
+                }
+                return true;
+            }
+        }
+        else{
+            auto SquaresIndex = m_activFig->getSquaresIndex();
+            for(int i=0; i <SquaresIndex.size();i++){
+                if(SquaresIndex[i].y>=0){
+                    if(m_isSquare[SquaresIndex[i].y][SquaresIndex[i].x]!=0){
+                        m_activFig->goRight();
+                        SquaresIndex = m_activFig->getSquaresIndex();
+                        for(int j=0; j <SquaresIndex.size();j++){
+                            if(SquaresIndex[j].y>=0){
+                                if(m_isSquare[SquaresIndex[j].y][SquaresIndex[j].x]!=0){
+                                    m_activFig->goRight();
+                                    SquaresIndex = m_activFig->getSquaresIndex();
+                                    for(int l=0;l<SquaresIndex.size();l++){
+                                        if(SquaresIndex[l].y>=0){
+                                            if(m_isSquare[SquaresIndex[l].y][SquaresIndex[l].x]!=0){
+                                                m_activFig->goLeft();
+                                                m_activFig->goLeft();
+                                                m_activFig->rotateRight();
+                                                return true;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        return false;
+                    }
+                }
+            }
+            return false;
+        }   
+    }
+
+
+
+
+};
+
+
+
+
 int main(){
     std::srand(std::time(nullptr));
     sf::RenderWindow window(sf::VideoMode({1200,800}),"Fenetre de test");
-    window.setVerticalSyncEnabled(true);
-    window.setPosition({0,0});
-    std::cout << window.getPosition().x <<  window.getPosition().y  << std::endl;
-    sf::Texture texture;
-    if(! texture.loadFromFile("image/OIP.jpg",false,sf::IntRect({0,0},{10000,10000}))){
-        std::cout << "Impossible d'afficher l'image" << std::endl;
-    }
-    sf::Sprite sprite(texture);
-    sprite.setTextureRect(sf::IntRect({0,0},{400,400}));
-    Square FirstCarre(40,sf::Color::Red,100,100);
 
-    TetrisFigure FirstFig1(50,sf::Color::Red,32,32,150,150,3);
-    
+    window.setPosition({0,0});
+
+    sf::RectangleShape rectangle({1200.f, 800.f});
+    rectangle.setFillColor(sf::Color::White);
+    GameBoard gameboard(200,50,32);
+    //TetrisFigure fig(50,sf::Color::Red,0,0,500,400,3);
+    //window.setFramerateLimit(60);   
     while(window.isOpen()){
+
         while(std::optional event = window.pollEvent()){
             if(event->is<sf::Event::Closed>()){
                 window.close();
@@ -647,26 +846,39 @@ int main(){
 
             if(const auto* UpKey = event->getIf<sf::Event::KeyPressed>()){
                 if(UpKey->scancode == sf::Keyboard::Scancode::Down){
-                    FirstFig1.goDown();
+                    gameboard.goDown();
+                    //fig.goDown();
                 }
                 if(UpKey->scancode == sf::Keyboard::Scancode::Left){
-                    FirstFig1.goLeft();
+                    gameboard.goLeft();
+                    //fig.goLeft();
                 }
                 if(UpKey->scancode == sf::Keyboard::Scancode::Right){
-                    FirstFig1.goRight();
+                    gameboard.goRight();
+                    //fig.goRight();
                 }
                 if(UpKey->scancode == sf::Keyboard::Scancode::H){
-                    FirstFig1.rotateLeft();
+                    gameboard.rotateLeft();
+                    // fig.rotateLeft();
+                    // std::cout << fig.getLeftAbsIndex() << std::endl;
+                    // std::cout << fig.getRightAbsIndex() << std::endl;
+                    // std::cout << fig.getTopOrdIndex() << std::endl;
+                    // std::cout << fig.getBottomOrdIndex() << std::endl;
                 }
                 if(UpKey->scancode == sf::Keyboard::Scancode::J){
-                    FirstFig1.rotateRight();
+                    gameboard.rotateRight();
+                    // fig.rotateRight();
+                    // std::cout << fig.getLeftAbsIndex() << std::endl;
+                    // std::cout << fig.getRightAbsIndex() << std::endl;
+                    // std::cout << fig.getTopOrdIndex() << std::endl;
+                    // std::cout << fig.getBottomOrdIndex() << std::endl;
                 }
             }
         }
         window.clear();
-        FirstCarre.move({1,1});
-        window.draw(FirstCarre);
-        FirstFig1.draw(window);
+        window.draw(rectangle);
+        gameboard.draw(window);     
+        //fig.draw(window);
         window.display();
     }
     return 0;
