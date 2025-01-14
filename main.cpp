@@ -15,7 +15,6 @@
 /******************************************************************************************************************************************** */
 
 class Generator;
-
 class TetrisColor{
 public:
     static constexpr sf::Color Orange = sf::Color(255,165,0);
@@ -101,6 +100,12 @@ public:
     requires std::integral<T>
     void setSide(T newside){
         m_side = newside;
+        //m_initX = this->getPosition().x;
+        //m_initY = this->getPosition().y;
+        m_vertices[0].position = sf::Vector2f(m_initX+m_side,m_initY);
+        m_vertices[1].position = sf::Vector2f(m_initX,m_initY);
+        m_vertices[2].position = sf::Vector2f(m_initX+m_side,m_initY +m_side);
+        m_vertices[3].position = sf::Vector2f(m_initX,m_initY+m_side);
     }
 
     bool operator ==(const Square &it){
@@ -164,6 +169,7 @@ public:
         }
         m_bottomOrdIndex -=1;
         m_topOrdIndex -=1;
+        m_bottomOrd -= m_side;
     }
 
     void goLeft(){
@@ -175,6 +181,7 @@ public:
         m_bottomAbsIndex -= 1;
         m_leftAbsIndex -=1;
         m_rightAbsIndex -=1;
+        m_bottomAbs -=m_side;
     }
 
     void goRight(){
@@ -186,6 +193,7 @@ public:
         m_bottomAbsIndex +=1;
         m_leftAbsIndex +=1;
         m_rightAbsIndex +=1;
+        m_bottomAbs += m_side;
     }
 
     void goDown(){
@@ -196,6 +204,7 @@ public:
         }
         m_bottomOrdIndex +=1;
         m_topOrdIndex +=1;
+        m_bottomOrd += m_side;
     }
 
     sf::Color getColor()const{
@@ -234,8 +243,16 @@ public:
         return m_bottomOrdIndex;
     }
 
+    int getBottomAbsIndex() const{
+        return m_bottomAbsIndex;
+    }
+
     int getBottomAbs() const{
         return m_bottomAbs;
+    }
+
+    int getBottomOrd() const{
+        return m_bottomOrd;
     }
 
     int getLeftAbsIndex() const{
@@ -244,6 +261,46 @@ public:
 
     int getRightAbsIndex() const{
         return m_rightAbsIndex;
+    }
+    
+    int getSide()const{
+        return m_side;
+    }
+
+    void printPosition(){
+        for(int i=0;i<m_squaresVector.size();i++){
+            std::cout << i << " : " << m_squaresVector[i].getPosition().x << " " << m_squaresVector[i].getPosition().y << std::endl;
+        }
+    }
+    sf::Vector2f getPosition() const{
+        return sf::Vector2f(m_bottomAbs,m_bottomOrd);
+    }
+
+    void setBottomAbs(const int &newBottomAbs){
+        setNewCoord(sf::Vector2f(newBottomAbs,m_bottomOrd),m_side);
+    }
+    
+    void setBottomOrd(const int &newBottomOrd){
+        setNewCoord(sf::Vector2f(m_bottomAbs,newBottomOrd),m_side);
+    }
+
+    void setNewCoord(sf::Vector2f newCoord,float newSide){
+
+
+        float deltax = newCoord.x - m_bottomAbs ;
+        float deltay = newCoord.y - m_bottomOrd;
+        std::cout << "Je suis en " << m_bottomAbs << "  " << m_bottomOrd <<std::endl;
+        std::cout << "Je vais en " << newCoord.x << "  " << newCoord.y << std::endl;
+        std::cout << "deltax " << deltax << "deltay " << deltay << std::endl;
+        for(int i=0 ; i<m_squaresVector.size();i++){
+            m_squaresVector[i].move(sf::Vector2f(deltax,deltay));
+            m_squaresVector[i].setSide(static_cast<int>(newSide));
+            std::cout << i << " : " << m_squaresVector[i].getPosition().x << " " << m_squaresVector[i].getPosition().y << std::endl;
+        }
+
+
+        m_bottomAbs = newCoord.x;
+        m_bottomOrd = newCoord.y;
     }
 
 
@@ -512,9 +569,58 @@ static std::shared_ptr<TetrisFigure> newTetrisFigure(int side,int bottomAbsIndex
     sf::Color color = m_tetrisColor[std::rand()%7];
     return std::make_shared<TetrisFigure>(side,color,bottomAbsIndex,bottomOrdIndex,bottomAbs,bottomOrd,figNum);
 }
+
  // Le générateur de figure 
 };
 
+
+class NextScreen{
+
+private:
+    std::shared_ptr<TetrisFigure> m_nextFig;
+    sf::RectangleShape m_nextScreen;
+    sf::Font m_font;
+    sf::Vector2f m_setFig;
+    sf::Vector2f m_setNext;
+public:
+
+    NextScreen(sf::Vector2f position, sf::Vector2f size,int side, sf::Vector2f setFig = sf::Vector2f(0,0),sf::Vector2f setNext = sf::Vector2f(0.0f,0.0f)):m_setFig(setFig),m_setNext(setNext){
+        m_nextScreen.setPosition(position);
+        m_nextScreen.setSize(size);
+        m_nextScreen.setFillColor(sf::Color::Black);
+        if(!m_font.openFromFile("font/MegamaxJonathanToo-YqOq2.ttf")){
+            std::cout << "font file non trouvé" << std::endl;
+        }
+        m_nextFig = Generator::newTetrisFigure(side,5,1,position.x+m_setFig.x,position.y+m_setFig.y);
+    }
+    void draw(sf::RenderWindow& window){
+        sf::Text next(m_font);
+
+        next.setString("NEXT : ");
+        next.setFillColor(sf::Color::White);
+        next.setPosition(sf::Vector2f(m_nextScreen.getPosition().x,m_nextScreen.getPosition().y)+m_setNext);
+        window.draw(m_nextScreen);
+        window.draw(next);
+        m_nextFig->draw(window);
+    }
+
+    void moveFig(sf::Vector2f vec){
+        m_nextFig->setNewCoord(vec,m_nextFig->getSide());
+    }
+
+    sf::Vector2f getPosition(){
+        return m_nextScreen.getPosition();
+    }
+
+    std::shared_ptr<TetrisFigure> transfertFig(int newSide, int newBottomAbsIndex,int newBottomOrdIndex ,int newBottomAbs,int newBottomOrd){
+        m_nextFig->setNewCoord(sf::Vector2f(newBottomAbs,newBottomOrd),newSide);
+        std::shared_ptr<TetrisFigure> newsetFig = m_nextFig;
+        m_nextFig.reset();
+        m_nextFig = Generator::newTetrisFigure(newSide,newBottomAbsIndex,newBottomOrdIndex,m_nextScreen.getPosition().x + m_setFig.x , m_nextScreen.getPosition().y + m_setFig.y);
+        return newsetFig;
+
+    }
+};
 
 class GameBoard{
     // vector<std::array<Square,11>
@@ -575,22 +681,43 @@ public:
         m_timerToGoDown.restart();
     }
 
-    bool gameEnded()const{
+    float getInitX()const{
+        return m_initX;
+    }
+
+    float getInitY()const{
+        return m_initY;
+    }
+
+    float getSide()const{
+        return m_side;
+    }
+
+    int getScore()const{
+        return m_score;
+    }
+    
+    int getLevel()const{
+        return m_level;
+    }
+
+    bool gameEnded() const{
         return m_gameEnded;
     }
 
-    void autoGoDown(){
+    void autoGoDown(NextScreen& nextScreen){
         if(m_timerToGoDown.getElapsedTime()>m_timeToGoDown){
-            goDown();
+            goDown(nextScreen);
             m_timerToGoDown.restart();
         }
     }
     
-    void goDown(){
+    void goDown(NextScreen& nextScreen){
         m_activFig->goDown();
+        auto squares = m_activFig->getSquaresIndex();
         if(isCollision()){
             m_activFig->goUp();
-            collision();
+            collision(nextScreen);
         }
     }
 
@@ -627,7 +754,6 @@ public:
                 }
             }
         }
-
         m_activFig->draw(window);
     }
 
@@ -655,6 +781,7 @@ private:
             m_level++;
             updateTimerToGoDown();
         }
+        m_timerToGoDown.restart();
     }
 
     void updateTimerToGoDown(){
@@ -705,7 +832,7 @@ private:
     }
 
     void restingSwap(std::vector<int>vec,int nonEmptyRow){
-        int bottomIndex = vec[0];
+        int bottomIndex = vec[0]-nonEmptyRow;
         int topIndex = vec.back() -1;
         for(int i=topIndex;i>=0;i--){
             for(int j=0 ; j<10;j++){
@@ -713,8 +840,8 @@ private:
                     m_gameBoard[i][j].move(sf::Vector2f(0,vec.size()*m_side));
                 }
             }
-            std::swap(m_isSquare[bottomIndex-nonEmptyRow + i-topIndex],m_isSquare[i]);
-            std::swap(m_gameBoard[bottomIndex-nonEmptyRow + i-topIndex],m_gameBoard[i]);            
+            std::swap(m_isSquare[bottomIndex + i-topIndex],m_isSquare[i]);
+            std::swap(m_gameBoard[bottomIndex + i-topIndex],m_gameBoard[i]);            
         }
     }
 
@@ -727,9 +854,9 @@ private:
     }
 
 
-    void collision(){
+    void collision(NextScreen& nextScreen){
         auto SquaresIndex = m_activFig->getSquaresIndex();
-        if(m_activFig->getTopOrdIndex()<0){
+        if(m_activFig->getTopOrdIndex()<0 || (m_activFig->getBottomOrdIndex()==1 && m_activFig->getBottomAbsIndex()==5 &&  m_activFig->getBottomOrdIndex()-m_activFig->getTopOrdIndex()>=1)){
             m_gameEnded =true;
         }
         if(!m_gameEnded){
@@ -742,9 +869,11 @@ private:
                 erase(rowCompleted);
                 int nonEmptyRow = internSwap(rowCompleted);
                 restingSwap(rowCompleted,nonEmptyRow);
+                updateScore(rowCompleted);
+                updateLevel();
             }
                 m_activFig.reset();
-                m_activFig = Generator::newTetrisFigure(m_side,5,1,m_initX+5*m_side,m_initY+1*m_side);
+                m_activFig = nextScreen.transfertFig(m_side,5,1,m_initX+5*m_side,m_initY+1*m_side);
         }
     }
 
@@ -805,6 +934,143 @@ private:
 };
 
 
+class ScoreScreen{
+
+private:
+
+    sf::Font m_font;
+    sf::RectangleShape m_scoreScreen;
+    
+    int m_score;
+    bool m_getScore=false;
+    sf::Vector2f m_setScore;
+
+    int m_level;
+    bool m_getLevel = false;
+    sf::Vector2f m_setLevel;
+
+public:
+
+    ScoreScreen(sf::Vector2f position, sf::Vector2f size,sf::Vector2f setScore = sf::Vector2f(0.0f,0.0f),sf::Vector2f setLevel = sf::Vector2f(0.0f,0.0f)):m_score(0),m_setScore(setScore),m_setLevel(setLevel){
+
+        m_scoreScreen.setPosition(position);
+        m_scoreScreen.setSize(size);
+        m_scoreScreen.setFillColor(sf::Color::Black);
+        if(!m_font.openFromFile("font/MegamaxJonathanToo-YqOq2.ttf")){
+            std::cout << "font file non trouvé" << std::endl;
+        }
+
+    }
+
+
+void setScore(unsigned int score){
+    m_score = score;
+    m_getScore = true;
+}
+
+void setLevel(unsigned int level){
+    m_level = level;
+    m_getLevel = true;
+}
+void setSize(const sf::Vector2f& vec){
+    m_scoreScreen.setSize(vec);
+}
+
+void setPosition(const sf::Vector2f& vec){
+    m_scoreScreen.setPosition(vec);
+}
+
+void moveScore(const sf::Vector2f& vec){
+    m_setScore = m_setScore + vec;
+}
+
+
+sf::Vector2f getPosition()const{
+    return m_scoreScreen.getPosition();
+}
+
+void draw(sf::RenderWindow& window){
+    window.draw(m_scoreScreen);
+    if(m_getScore){
+        std::string strScore = std::to_string(m_score);
+        strScore = "Score : " + strScore;
+        sf::Text score(m_font);
+        score.setString(strScore);
+        score.setFillColor(sf::Color::White);
+        score.setPosition(sf::Vector2f(m_scoreScreen.getPosition().x,m_scoreScreen.getPosition().y)+m_setScore);
+        window.draw(score);
+    }
+    if(m_getLevel){
+        std::string strLevel = std::to_string(m_level);
+        strLevel = "Level : " + strLevel; 
+        sf::Text level(m_font);
+        level.setString(strLevel);
+        level.setFillColor(sf::Color::White);
+        level.setPosition(sf::Vector2f(m_scoreScreen.getPosition().x,m_scoreScreen.getPosition().y)+m_setLevel);
+        window.draw(level);
+    }
+}
+
+};
+
+
+
+class ScreenGame{
+
+    NextScreen nextScreen;
+    ScoreScreen scoreScreen;
+    GameBoard gameBoard;
+
+public:
+
+    ScreenGame(float initX,float initY,float side):gameBoard(initX,initY,side),nextScreen(sf::Vector2f(initX+side*12,initY+side*13),sf::Vector2f(10*side,6*side),side,sf::Vector2f(8*side,4*side),sf::Vector2f(side,3*side)),scoreScreen(sf::Vector2f(initX+side*12,initY+side*3),sf::Vector2f(10*side,6*side),sf::Vector2f(0.5*side,3*side),sf::Vector2f(0.5*side,1*side)){
+        scoreScreen.setLevel(0);
+        scoreScreen.setScore(0);
+    }
+
+    void goDown(){
+        gameBoard.goDown(nextScreen);
+        std::cout << "gameboard space " << gameBoard.getInitX() << "  " << gameBoard.getInitY()<< std::endl;
+        std::cout << "Next space " << nextScreen.getPosition().x << "  " << nextScreen.getPosition().y << std::endl;
+        // goDown( (std::shared_ptr<TetrisFigure>) (*foo) (int a, int b, int c, int d, int e) = Generator::newTetrisFigure)
+    }
+
+    void autoGoDown(){
+        gameBoard.autoGoDown(nextScreen);
+    }
+
+    void goLeft(){
+        gameBoard.goLeft();
+    }
+
+    void goRight(){
+        gameBoard.goRight();
+    }
+
+
+    void rotateLeft(){
+        gameBoard.rotateLeft();
+    }
+
+    void rotateRight(){
+        gameBoard.rotateRight();
+    }
+
+    bool gameEnded() const{
+        return gameBoard.gameEnded();
+    }
+
+    void draw(sf::RenderWindow& window){
+        scoreScreen.setScore(gameBoard.getScore()); 
+        scoreScreen.setLevel(gameBoard.getLevel());
+        gameBoard.draw(window);
+        scoreScreen.draw(window);
+        nextScreen.draw(window);
+
+    }
+
+};
+
 
 
 int main(){
@@ -815,8 +1081,8 @@ int main(){
 
     sf::RectangleShape rectangle({1200.f, 800.f});
     rectangle.setFillColor(sf::Color::White);
-    GameBoard gameboard(200,50,32);
-    //TetrisFigure fig(50,sf::Color::Red,0,0,500,400,3);
+    ScreenGame gameboard(200,50,32);
+    TetrisFigure fig(50,sf::Color::Red,0,0,500,400,3);
     //window.setFramerateLimit(60);   
     while(window.isOpen()){
 
@@ -864,6 +1130,8 @@ int main(){
         //fig.draw(window);
         window.display();
     }
+
+
     return 0;
 }
 
