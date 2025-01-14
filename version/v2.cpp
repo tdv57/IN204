@@ -289,13 +289,9 @@ public:
 
         float deltax = newCoord.x - m_bottomAbs ;
         float deltay = newCoord.y - m_bottomOrd;
-        std::cout << "Je suis en " << m_bottomAbs << "  " << m_bottomOrd <<std::endl;
-        std::cout << "Je vais en " << newCoord.x << "  " << newCoord.y << std::endl;
-        std::cout << "deltax " << deltax << "deltay " << deltay << std::endl;
         for(int i=0 ; i<m_squaresVector.size();i++){
             m_squaresVector[i].move(sf::Vector2f(deltax,deltay));
             m_squaresVector[i].setSide(static_cast<int>(newSide));
-            std::cout << i << " : " << m_squaresVector[i].getPosition().x << " " << m_squaresVector[i].getPosition().y << std::endl;
         }
 
 
@@ -1030,8 +1026,6 @@ public:
 
     void goDown(){
         gameBoard.goDown(nextScreen);
-        std::cout << "gameboard space " << gameBoard.getInitX() << "  " << gameBoard.getInitY()<< std::endl;
-        std::cout << "Next space " << nextScreen.getPosition().x << "  " << nextScreen.getPosition().y << std::endl;
         // goDown( (std::shared_ptr<TetrisFigure>) (*foo) (int a, int b, int c, int d, int e) = Generator::newTetrisFigure)
     }
 
