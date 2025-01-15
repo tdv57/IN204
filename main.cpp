@@ -633,6 +633,21 @@ private:
     unsigned int m_score;
     sf::Clock m_timerToGoDown;
     sf::Time m_timeToGoDown;
+    static constexpr std::array m_timeForLevels = {sf::milliseconds(1000),
+                                                    sf::milliseconds(950),
+                                                    sf::milliseconds(900),
+                                                    sf::milliseconds(850),
+                                                    sf::milliseconds(800),
+                                                    sf::milliseconds(750),
+                                                    sf::milliseconds(700),
+                                                    sf::milliseconds(600),
+                                                    sf::milliseconds(550),
+                                                    sf::milliseconds(500),
+                                                    sf::milliseconds(450),
+                                                    sf::milliseconds(400),
+                                                    sf::milliseconds(350),
+                                                    sf::milliseconds(300),
+                                                    sf::milliseconds(250)};
     std::shared_ptr<TetrisFigure> m_activFig;
     bool m_gameEnded = false;
 
@@ -741,8 +756,28 @@ public:
 
     void draw(sf::RenderWindow& window){
         window.draw(m_rectangle);
+        sf::VertexArray vLine(sf::PrimitiveType::Lines, 2);
+        vLine[0].position = sf::Vector2f(m_rectangle.getPosition().x , m_rectangle.getPosition().y);
+        vLine[1].position = sf::Vector2f(m_rectangle.getPosition().x , m_rectangle.getPosition().y+m_side*23);
+        vLine[0].color = sf::Color::White;
+        vLine[1].color = sf::Color::White;
+        for(int i=0;i<=10;i++){
+            window.draw(vLine);
+            vLine[0].position += (sf::Vector2f(m_side,0));
+            vLine[1].position += (sf::Vector2f(m_side,0));   
+        }
 
 
+        sf::VertexArray hLine(sf::PrimitiveType::Lines, 2);
+        hLine[0].position = sf::Vector2f(m_rectangle.getPosition().x ,m_rectangle.getPosition().y );
+        hLine[1].position = sf::Vector2f(m_rectangle.getPosition().x +10*m_side ,m_rectangle.getPosition().y);
+        hLine[0].color = sf::Color::White;
+        hLine[1].color = sf::Color::White;
+        for(int j=0;j<=22;j++){
+            window.draw(hLine);
+            hLine[0].position += (sf::Vector2f(0,m_side));
+            hLine[1].position += (sf::Vector2f(0,m_side));
+        }
         for(int j=0;j<22;j++){
             for(int i=0 ;i<10;i++){
                 if(m_isSquare[j][i]!=0){
@@ -751,6 +786,7 @@ public:
             }
         }
         m_activFig->draw(window);
+    
     }
 
 private:
@@ -781,12 +817,7 @@ private:
     }
 
     void updateTimerToGoDown(){
-        if(m_level!=0){
-            m_timeToGoDown = m_timeToGoDown - sf::seconds(0.9 * (m_level-1)/m_level);
-        }
-        else{
-            m_timeToGoDown = m_timeToGoDown-sf::seconds(0.9);
-        }
+        m_timeToGoDown = sf::Time( m_timeForLevels[m_level-1]);
        
     }
     bool completedRow(int row){
