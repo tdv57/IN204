@@ -634,20 +634,20 @@ private:
     sf::Clock m_timerToGoDown;
     sf::Time m_timeToGoDown;
     static constexpr std::array m_timeForLevels = {sf::milliseconds(1000),
-                                                    sf::milliseconds(950),
-                                                    sf::milliseconds(900),
+                                                    sf::milliseconds(925),
                                                     sf::milliseconds(850),
-                                                    sf::milliseconds(800),
-                                                    sf::milliseconds(750),
+                                                    sf::milliseconds(775),
                                                     sf::milliseconds(700),
+                                                    sf::milliseconds(675),
                                                     sf::milliseconds(600),
-                                                    sf::milliseconds(550),
-                                                    sf::milliseconds(500),
+                                                    sf::milliseconds(525),
                                                     sf::milliseconds(450),
-                                                    sf::milliseconds(400),
-                                                    sf::milliseconds(350),
+                                                    sf::milliseconds(375),
                                                     sf::milliseconds(300),
-                                                    sf::milliseconds(250)};
+                                                    sf::milliseconds(250),
+                                                    sf::milliseconds(200),
+                                                    sf::milliseconds(100),
+                                                    sf::milliseconds(50)};
     std::shared_ptr<TetrisFigure> m_activFig;
     bool m_gameEnded = false;
 
