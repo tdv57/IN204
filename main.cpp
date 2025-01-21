@@ -15,6 +15,8 @@
 /******************************************************************************************************************************************** */
 
 class Generator;
+
+// Classe des couleurs
 class TetrisColor{
 public:
     static constexpr sf::Color Orange = sf::Color(255,165,0);
@@ -27,7 +29,7 @@ public:
     static constexpr sf::Color Blue = sf::Color::Blue;
 };
 
-
+// Multiplication d'un vecteur par un scalaire
 sf::Vector2i operator * (const float& side,const sf::Vector2i v){
     return sf::Vector2i(side*v.x,side*v.y);
 }
@@ -44,16 +46,20 @@ sf::Vector2f operator * (const sf::Vector2f v,const float& side){
     return sf::Vector2f(side*v.x,side*v.y);
 }
 
-
+// Classe des carrés élémentaires
 class Square: public sf::Drawable, public sf::Transformable { 
 
 private:
     sf::VertexArray m_vertices;
+    // Vecteur contenant les 4 coins
     float m_side;
+    // Longueur d'un côté du carré
     float m_initX;
+    // Abscisse initiale
     float m_initY;
+    // Ordonnée initiale
     sf::Color m_color;
-
+    // Couleur
 
 public:
 
@@ -69,6 +75,8 @@ public:
         m_vertices[1].position = sf::Vector2f(m_initX,m_initY);
         m_vertices[2].position = sf::Vector2f(m_initX+m_side,m_initY +m_side);
         m_vertices[3].position = sf::Vector2f(m_initX,m_initY+m_side);
+        // Position des coins: 10
+        //                     32
 
         for(int i=0; i<4;i++){
             m_vertices[i].color = m_color;
@@ -143,16 +151,27 @@ class Figure {
 protected:
 
     sf::Color m_color;
+    // Couleur de la pièce
     float m_side;
+    // Longueur d'un côté de carré
     std::vector<Square> m_squaresVector; // Je crois qu'on en a pas besoin
+    // Les différents carrés de la pièce, normalement au nombre de 4
     std::vector<sf::Vector2i> m_squaresIndex;
+    // Index des différents carrés au sein de la pièce, permet d'identifier les carrés composant une pièce
     int m_bottomAbsIndex;
+    // Abscisse du carré le plus en bas sous forme d'index
     int m_bottomOrdIndex;
+    // Ordonnée du carré le plus en bas sous forme d'index
     int m_leftAbsIndex;
+    // Abscisse du carré le plus à gauche sous forme d'index
     int m_rightAbsIndex;
+    // Abscisse du carré le plus à droite sous forme d'index
     int m_topOrdIndex;
+    // Ordonnée du carré le plus en haut sous forme d'index
     int m_bottomAbs;
+    // Abscisse réelle du carré le plus en bas, noté 0 dans les schémas de la classe TetrisFigure (voir plus loin)
     int m_bottomOrd;
+    // Ordonnée réelle du carré le plus en bas, noté 0 dans les schémas de la classe TetrisFigure (voir plus loin)
 
     // On va créer pour chaque classe fille une initialisation
 
@@ -314,10 +333,14 @@ class TetrisFigure: public Figure{
 
 private:
 
+    // Pour chacune des pièces, m_changeArray donne le déplacement de chaque carré élémentaire pour chaque rotation possible
+    // Exemple: m_changeArray[m_figNum][changeIndex][i] donne pour la figure numéro m_figNum, la rotation correspondant à changeIndex
+    // et le carré numéro i le déplacement à effectuer
     static constexpr std::array<std::array<std::array<sf::Vector2i, 4>, 4>, 7> m_changeArray = {{
         {{   
         // Figure -> 23
         //            01
+        // Pièce Z, 2 rotations différentes
             {{sf::Vector2i(0, 0), sf::Vector2i(0, -2), sf::Vector2i(2, 0), sf::Vector2i(0, 0)}},{{sf::Vector2i(0, 0), sf::Vector2i(0, 2), sf::Vector2i(-2, 0), sf::Vector2i(0, 0)}}   
         }},
         {{   
@@ -325,37 +348,45 @@ private:
         //           2
         //           1
         //           0 
+        // Pièce I, 2 rotations différentes
             {{sf::Vector2i(0, 0), sf::Vector2i(1, 1), sf::Vector2i(-1, 2), sf::Vector2i(-2, 3)}},{{sf::Vector2i(0, 0), sf::Vector2i(-1, -1), sf::Vector2i(1, -2), sf::Vector2i(2, -3)}}   
         }},
         {{   
         // Figure ->  2
         //            1
         //           30 
+        // Pièce J, 4 rotations différentes
             {{sf::Vector2i(0, 0), sf::Vector2i(-2, 0), sf::Vector2i(-2, 2), sf::Vector2i(0, 0)}},{{sf::Vector2i(0, -2), sf::Vector2i(1, 0), sf::Vector2i(1, 0), sf::Vector2i(0, -2)}},{{sf::Vector2i(-2, 1), sf::Vector2i(1, 0), sf::Vector2i(1, 0),sf::Vector2i(0, 1) }},{{sf::Vector2i(2, 1), sf::Vector2i(0, 0), sf::Vector2i(0, -2), sf::Vector2i(0, 1)}}      
         }},
         {{   
         // Figure -> 123
         //            0
+        // Pièce T, 4 rotations différentes
             {{sf::Vector2i(1, 0), sf::Vector2i(2, -1), sf::Vector2i(0, 0), sf::Vector2i(0,0)}},{{sf::Vector2i(0, 0), sf::Vector2i(-1, 1), sf::Vector2i(-1, 1), sf::Vector2i(-1, 1)}}, {{sf::Vector2i(0, -1), sf::Vector2i(0,0), sf::Vector2i(1, -2), sf::Vector2i(0, 0)}},{{sf::Vector2i(-1, 1), sf::Vector2i(-1, 0), sf::Vector2i(0, 1), sf::Vector2i(1, -1)}}  
         }},
         {{   
         // Figure -> 3
         //           2
         //           10
+        // Pièce L, 4 rotations différentes
             {{sf::Vector2i(0,-1), sf::Vector2i(0, -1), sf::Vector2i(-1, 1), sf::Vector2i(-1, 1)}},{{sf::Vector2i(0, 0), sf::Vector2i(1, -1), sf::Vector2i(2, 0), sf::Vector2i(1, -1)}},{{sf::Vector2i(0, 0), sf::Vector2i(-1, 2), sf::Vector2i(0, 0), sf::Vector2i(-1, 2)}},{{sf::Vector2i(0, 1), sf::Vector2i(0, 0), sf::Vector2i(-1, -1), sf::Vector2i(1, -2)}}       
         }},
         {{   
         // Figure ->  32
         //           10
+        // Pièce S, 2 rotations différentes
             {{sf::Vector2i(0, -2), sf::Vector2i(2, 0), sf::Vector2i(0, 0), sf::Vector2i(0, 0)}},{{sf::Vector2i(0, 2), sf::Vector2i(-2, 0), sf::Vector2i(0, 0), sf::Vector2i(0, 0)}}   
         }},
         {{   
         // Figure -> 32
         //           10
+        // Pièce O, 1 unique rotation
             {{sf::Vector2i(0, 0), sf::Vector2i(0, 0), sf::Vector2i(0, 0), sf::Vector2i(0, 0)}}   
         }}
     }};
 
+    // De la même manière, m_changeAbsArray donne le déplacement du carré le plus à gauche, du carré le plus à droite
+    // et la modification de la longueur de la figure en abscisse (ce qui correspond à la différence des 2 termes précédents)
     static constexpr std::array<std::array<sf::Vector3i,4>,7> m_changeAbsArray = {{
         // Figure -> 23
         //            01
@@ -385,8 +416,14 @@ private:
     }};
 
     int m_changeIndex;
+    // Représente le nombre de rotations faites depuis la configuration de référence
+    // Une rotation à gauche est comptée positivement, une rotation à droite négativement
     int m_figNum;
+    // Le numéro de la figure permettant d'identifier la forme de la pièce manipulée
     static constexpr std::array<int,7> m_nbPositionArray = {2,2,4,4,4,2,1};
+    // Nombre de rotations différentes pour chaque pièce 
+    // Ordre des pièces: Z, I, J, T, L, S, O
+    // Exemple: la rotation de la pièce O ne change rien donc il n'y a qu'une rotation, cette dernière ne fait rien
 
 
 public:
@@ -394,10 +431,12 @@ public:
     {
         if(figNum==1){
             // Je rajoute squaresIndex
-            m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex,bottomOrdIndex));
-            m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex+1,bottomOrdIndex));
-            m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex-1,bottomOrdIndex-1));
-            m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex,bottomOrdIndex-1));
+            // Figure Z -> 23
+            //              01
+            m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex,bottomOrdIndex)); // carré 0 de la figure ci-dessus
+            m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex+1,bottomOrdIndex)); // carré 1
+            m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex-1,bottomOrdIndex-1)); // carré 2
+            m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex,bottomOrdIndex-1)); // carré 3
             // Je trace  avec setSquares()
             setSquares();
             m_topOrdIndex = bottomOrdIndex-1;
@@ -406,6 +445,10 @@ public:
         }
         else if(figNum==2){
             // Je rajoute squaresIndex
+            // Figure I -> 3
+            //             2
+            //             1
+            //             0 
             m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex,bottomOrdIndex));
             m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex,bottomOrdIndex-1));
             m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex,bottomOrdIndex-2));
@@ -418,6 +461,9 @@ public:
         }
         else if(figNum==3){
             // Je rajoute squaresIndex
+            // Figure J ->  2
+            //              1
+            //             30
             m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex,bottomOrdIndex));
             m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex,bottomOrdIndex-1));
             m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex,bottomOrdIndex-2));
@@ -431,6 +477,8 @@ public:
         }
         else if(figNum==4){
             // Je rajoute squaresIndex
+            // Figure T -> 123
+            //              0
             m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex,bottomOrdIndex));
             m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex-1,bottomOrdIndex-1));
             m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex,bottomOrdIndex-1));
@@ -444,6 +492,9 @@ public:
         }
         else if(figNum==5){
             // Je rajoute squaresIndex
+            // Figure L -> 3
+            //             2
+            //             10
             m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex,bottomOrdIndex));
             m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex-1,bottomOrdIndex));
             m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex-1,bottomOrdIndex-1));
@@ -457,6 +508,8 @@ public:
         }
         else if(figNum==6){
             // Je rajoute squaresIndex
+            // Figure S ->  32
+            //             10
             m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex,bottomOrdIndex));
             m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex-1,bottomOrdIndex));
             m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex+1,bottomOrdIndex-1));
@@ -469,6 +522,8 @@ public:
             m_rightAbsIndex = bottomAbsIndex+1;
         }
         else if(figNum==7){
+            // Figure O -> 32
+            //             10
             m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex,bottomOrdIndex));
             m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex-1,bottomOrdIndex));
             m_squaresIndex.emplace_back(sf::Vector2i(bottomAbsIndex,bottomOrdIndex-1));
