@@ -895,19 +895,23 @@ private:
     }
 
     int internSwap(std::vector<int> vec){
-        int nonEmptyRow =0;
+        int emptyRow =1;
+        int nonEmptyRow = 0;
         int bottomIndex = m_activFig->getBottomOrdIndex();
         for(int i=vec[0]-1;i>vec.back(); i--){
             auto it = std::find(vec.begin(), vec.end(), i);
             if(it==vec.end()){
                 for(int j=0 ; j<10;j++){
                     if(m_isSquare[i][j]==1){
-                        m_gameBoard[i][j].move(sf::Vector2f(0,vec.size()*m_side));
-                    }
+                        m_gameBoard[i][j].move(sf::Vector2f(0,m_side*(emptyRow)));
+                     }
                 }
                 std::swap(m_isSquare[bottomIndex - nonEmptyRow],m_isSquare[i]);
                 std::swap(m_gameBoard[bottomIndex - nonEmptyRow],m_gameBoard[i]);
                 nonEmptyRow++;
+            }
+            else{
+                emptyRow++;
             }
         }
         return nonEmptyRow;
