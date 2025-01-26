@@ -678,7 +678,7 @@ class GameBoard{
     // 22 longueurs 10 largeurs // Il faut des cases en plus invisibles pour charger l'objet   
 private:
 
-    
+    bool m_rotateOrTranslate = false;
     int m_nbRow=22;
     int m_nbColumn=10;
     float m_initX;
@@ -783,6 +783,10 @@ public:
         auto squares = m_activFig->getSquaresIndex();
         if(isCollision()){
             m_activFig->goUp();
+            if(m_rotateOrTranslate==true){
+                return;
+            }
+
             collision(nextScreen);
         }
     }
@@ -807,6 +811,14 @@ public:
 
     void rotateRight(){
         isRightRotationCollision();
+    }
+
+    void rotateOrTranslate(bool truth){
+        m_rotateOrTranslate=truth;
+    }
+
+    bool isRotateOrTranslate() const{
+        return m_rotateOrTranslate;
     }
 
     void draw(sf::RenderWindow& window){
@@ -1101,6 +1113,7 @@ void draw(sf::RenderWindow& window){
 
 
 
+
 class ScreenGame{
 
     NextScreen nextScreen;
@@ -1142,6 +1155,14 @@ public:
 
     bool gameEnded() const{
         return gameBoard.gameEnded();
+    }
+
+    void rotateOrTranslate(bool truth){
+        gameBoard.rotateOrTranslate(truth);
+    }
+
+    bool isRotateOrTranslate(){
+        return gameBoard.isRotateOrTranslate();
     }
 
     void draw(sf::RenderWindow& window){
