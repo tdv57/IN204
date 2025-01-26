@@ -14,7 +14,6 @@
 /******************************************************************************************************************************************** */
 /******************************************************************************************************************************************** */
 
-
 int main(){
     std::srand(std::time(nullptr));
     sf::RenderWindow window(sf::VideoMode({1200,800}),"Fenetre de test");
@@ -54,19 +53,15 @@ int main(){
                         
                         if(UpKey->scancode == sf::Keyboard::Scancode::Left){
                             gameboard.goLeft();
-                            gameboard.rotateOrTranslate(true);
                         }
                         if(UpKey->scancode == sf::Keyboard::Scancode::Right){
                             gameboard.goRight();
-                            gameboard.rotateOrTranslate(true);
                         }
                         if(UpKey->scancode == sf::Keyboard::Scancode::H){
                             gameboard.rotateLeft();
-                            gameboard.rotateOrTranslate(true);
                         }
                         if(UpKey->scancode == sf::Keyboard::Scancode::J){
                             gameboard.rotateRight();
-                            gameboard.rotateOrTranslate(true);
                         }     
                     }
 
@@ -88,4 +83,3 @@ int main(){
 
     return 0;
 }
-

@@ -673,6 +673,7 @@ public:
     }
 };
 
+
 class GameBoard{
     // vector<std::array<Square,11>
     // 22 longueurs 10 largeurs // Il faut des cases en plus invisibles pour charger l'objet   
@@ -794,15 +795,22 @@ public:
     void goLeft(){
         m_activFig->goLeft();
         if(isCollision()){
+            rotateOrTranslate(false);
             m_activFig->goRight();
+            return;
         }
+        rotateOrTranslate(true);
     }
+
 
     void goRight(){
         m_activFig->goRight();
         if(isCollision()){
+            rotateOrTranslate(false);
             m_activFig-> goLeft();
+            return;
         }
+        rotateOrTranslate(true);
     }
 
     void rotateLeft(){
@@ -1003,10 +1011,12 @@ private:
                     m_activFig->goLeft();
                     m_activFig->goLeft();
                     m_activFig->rotateRight();
+                    rotateOrTranslate(false);
                     return true;
                 }
             }
         }
+        rotateOrTranslate(true);
         return false;
     }
 
@@ -1021,10 +1031,12 @@ private:
                     m_activFig->goLeft();
                     m_activFig->goLeft();
                     m_activFig->rotateLeft();
+                    rotateOrTranslate(false);
                     return true;
                 }
             }
         }
+        rotateOrTranslate(true);
         return false;
     }
 
@@ -1113,7 +1125,6 @@ void draw(sf::RenderWindow& window){
 
 
 
-
 class ScreenGame{
 
     NextScreen nextScreen;
@@ -1175,5 +1186,4 @@ public:
     }
 
 };
-
 
