@@ -16,7 +16,7 @@
 
 int main(){
     std::srand(std::time(nullptr));
-    sf::RenderWindow window(sf::VideoMode({1200,800}),"Fenetre de test");
+    sf::RenderWindow window(sf::VideoMode({1200,800}),"Tetris MORGAND & ALAIN");
 
     window.setPosition({0,0});
     sf::View fixedView(sf::FloatRect({0, 0}, {1200, 800}));
@@ -24,7 +24,7 @@ int main(){
     sf::RectangleShape rectangle({1200.f, 800.f});
     rectangle.setFillColor(sf::Color::White);
     ScreenGame gameboard(200,50,32);
-    TetrisFigure fig(50,sf::Color::Red,0,0,500,400,3);
+    
     while(window.isOpen()){
 
         while(std::optional event = window.pollEvent()){
