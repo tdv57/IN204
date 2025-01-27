@@ -1,5 +1,5 @@
 # IN204
-Projet tetris pour le cours IN204
+Projet tetris pour le cours IN204 
 Binômes: Thaddée MORGAND, Ferdinand ALAIN
 
 ## Présentation du projet
