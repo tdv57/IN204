@@ -30,21 +30,13 @@ public:
 };
 
 // Multiplication d'un vecteur par un scalaire
-sf::Vector2i operator * (const float& side,const sf::Vector2i v){
-    return sf::Vector2i(side*v.x,side*v.y);
-}
+sf::Vector2i operator * (const float& side,const sf::Vector2i v);
 
-sf::Vector2f operator * (const float& side,const sf::Vector2f v){
-    return sf::Vector2f(side*v.x,side*v.y);
-}
+sf::Vector2f operator * (const float& side,const sf::Vector2f v);
 
-sf::Vector2i operator * (const sf::Vector2i v,const float& side){
-    return sf::Vector2i(side*v.x,side*v.y);
-}
+sf::Vector2i operator * (const sf::Vector2i v,const float& side);
 
-sf::Vector2f operator * (const sf::Vector2f v,const float& side){
-    return sf::Vector2f(side*v.x,side*v.y);
-}
+sf::Vector2f operator * (const sf::Vector2f v,const float& side);
 
 // Classe des carrés élémentaires
 class Square: public sf::Drawable, public sf::Transformable { 
@@ -88,21 +80,13 @@ public:
     }
 
 
-    float getNewInitX() const{
-        return m_initX;
-    }
+    float getNewInitX() const;
 
-    float getNewInitY() const{
-        return m_initY;
-    }
+    float getNewInitY() const;
 
-    float getSide()const{
-        return m_side;
-    }
+    float getSide()const;
 
-    sf::Color getColor() const{
-        return m_color;
-    }
+    sf::Color getColor() const;
 
     template<typename T>
     requires std::integral<T>
@@ -116,29 +100,14 @@ public:
         m_vertices[3].position = sf::Vector2f(m_initX,m_initY+m_side);
     }
 
-    bool operator ==(const Square &it){
-        if(it.getColor() == getColor() && it.getSide()==m_side){
-            return true;
-        }
-        return false;
-    }
+    bool operator ==(const Square &it);
 
-    bool operator !=(const Square &it){
-        if(it.getColor() != getColor() || it.getSide()!=m_side){
-            return true;
-        }
-        return false;
-    }
+    bool operator !=(const Square &it);
+
+    ~Square(){}
 
 private:
-    void draw(sf::RenderTarget& target, sf::RenderStates states) const override
-    {
-        // apply the transform
-        states.transform *= getTransform();
-
-        // draw the vertex array
-        target.draw(m_vertices, states);
-    }
+    void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
 
 };
@@ -180,143 +149,50 @@ public:
 
     Figure(float side,sf::Color color,int bottomAbsIndex, int bottomOrdIndex,int bottomAbs,int bottomOrd):m_side(side),m_color(color),m_bottomAbsIndex(bottomAbsIndex),m_bottomOrdIndex(bottomOrdIndex),m_bottomAbs(bottomAbs),m_bottomOrd(bottomOrd){}
     
-    void goUp(){
-        int size = m_squaresIndex.size();
-        for(int i=0; i<size;i++){
-            m_squaresIndex[i].y -=1;
-            m_squaresVector[i].move(m_side * sf::Vector2f(0,-1));
-        }
-        m_bottomOrdIndex -=1;
-        m_topOrdIndex -=1;
-        m_bottomOrd -= m_side;
-    }
+    void goUp();
 
-    void goLeft(){
-        int size = m_squaresIndex.size();
-        for(int i=0 ; i<size;i++){
-            m_squaresIndex[i].x -= 1;
-            m_squaresVector[i].move(m_side * sf::Vector2f(-1,0));
-        }
-        m_bottomAbsIndex -= 1;
-        m_leftAbsIndex -=1;
-        m_rightAbsIndex -=1;
-        m_bottomAbs -=m_side;
-    }
+    void goLeft();
 
-    void goRight(){
-        int size = m_squaresIndex.size();
-        for(int i=0; i<size;i++){
-            m_squaresIndex[i].x +=1;
-            m_squaresVector[i].move(m_side * sf::Vector2f(1,0));
-        }
-        m_bottomAbsIndex +=1;
-        m_leftAbsIndex +=1;
-        m_rightAbsIndex +=1;
-        m_bottomAbs += m_side;
-    }
+    void goRight();
 
-    void goDown(){
-        int size = m_squaresIndex.size();
-        for(int i=0; i<size;i++){
-            m_squaresIndex[i].y +=1;
-            m_squaresVector[i].move(m_side * sf::Vector2f(0,1));
-        }
-        m_bottomOrdIndex +=1;
-        m_topOrdIndex +=1;
-        m_bottomOrd += m_side;
-    }
+    void goDown();
 
-    sf::Color getColor()const{
-        return m_color;
-    }
-    auto getSquaresIndex() const{
-        return m_squaresIndex;
-    }
+    sf::Color getColor()const;
 
-    void printSquaresIndex() const{
-        for(int i=0 ; i<m_squaresIndex.size(); i++){
-            std::cout << m_squaresIndex[i].x << " " << m_squaresIndex[i].y << std::endl;
-        }
-    }
+    auto getSquaresIndex() const;
 
-    void setSquares(){
-        for(int i=0 ; i<m_squaresIndex.size();i++){
-            m_squaresVector.emplace_back(Square(m_side,m_color,m_bottomAbs + m_side * (m_squaresIndex[i].x-m_bottomAbsIndex) , m_bottomOrd + m_side * (m_squaresIndex[i].y-m_bottomOrdIndex) ));
-        }
-    }
+    void printSquaresIndex() const;
 
-    int getNbSquares() const{
-        return m_squaresVector.size();
-    }
+    void setSquares();
+
+    int getNbSquares() const;
 
 
-    void draw(sf::RenderWindow& window){
-        int size = m_squaresVector.size();
-        for (int i=0;i<size;i++){
-            window.draw(m_squaresVector[i]);
-        } 
-    } // En gros grâce à m_origin m_originIndex m_side et m_squaresIndex on peut tout tracer;
+    void draw(sf::RenderWindow& window);
 
 
-    int getBottomOrdIndex() const{
-        return m_bottomOrdIndex;
-    }
+    int getBottomOrdIndex() const;
 
-    int getBottomAbsIndex() const{
-        return m_bottomAbsIndex;
-    }
+    int getBottomAbsIndex() const;
 
-    int getBottomAbs() const{
-        return m_bottomAbs;
-    }
+    int getBottomAbs() const;
 
-    int getBottomOrd() const{
-        return m_bottomOrd;
-    }
+    int getBottomOrd() const;
 
-    int getLeftAbsIndex() const{
-        return m_leftAbsIndex;
-    }
+    int getLeftAbsIndex() const;
 
-    int getRightAbsIndex() const{
-        return m_rightAbsIndex;
-    }
+    int getRightAbsIndex() const;
     
-    int getSide()const{
-        return m_side;
-    }
+    int getSide()const;
 
-    void printPosition(){
-        for(int i=0;i<m_squaresVector.size();i++){
-            std::cout << i << " : " << m_squaresVector[i].getPosition().x << " " << m_squaresVector[i].getPosition().y << std::endl;
-        }
-    }
-    sf::Vector2f getPosition() const{
-        return sf::Vector2f(m_bottomAbs,m_bottomOrd);
-    }
+    void printPosition();
+    sf::Vector2f getPosition() const;
 
-    void setBottomAbs(const int &newBottomAbs){
-        setNewCoord(sf::Vector2f(newBottomAbs,m_bottomOrd),m_side);
-    }
+    void setBottomAbs(const int &newBottomAbs);
     
-    void setBottomOrd(const int &newBottomOrd){
-        setNewCoord(sf::Vector2f(m_bottomAbs,newBottomOrd),m_side);
-    }
+    void setBottomOrd(const int &newBottomOrd);
 
-    void setNewCoord(sf::Vector2f newCoord,float newSide){
-
-
-        float deltax = newCoord.x - m_bottomAbs ;
-        float deltay = newCoord.y - m_bottomOrd;
-        for(int i=0 ; i<m_squaresVector.size();i++){
-            m_squaresVector[i].move(sf::Vector2f(deltax,deltay));
-            m_squaresVector[i].setSide(static_cast<int>(newSide));
-        }
-
-
-        m_bottomAbs = newCoord.x;
-        m_bottomOrd = newCoord.y;
-    }
+    void setNewCoord(sf::Vector2f newCoord,float newSide);
 
 
     // virtual void RotateLeft() = 0; // Chaque classe fille va implémenter sa rotation
@@ -539,71 +415,24 @@ public:
     }
 
 
-    int getChangeIndex() const{
-        return m_changeIndex;
-    }
+    int getChangeIndex() const;
 
-    void decreaseChangeIndex(){
-        m_changeIndex--;
-        if(m_changeIndex<0){
-            m_changeIndex=m_nbPositionArray[m_figNum]-1;
-        }
-    }
-    void increaseChangeIndex(){
-        m_changeIndex++;
-        m_changeIndex = m_changeIndex%m_nbPositionArray[m_figNum];
-        }
+    void decreaseChangeIndex();
+    void increaseChangeIndex();
 
-    void setChangeIndex(int n){
-        if(n>=0 && n<=m_nbPositionArray[m_figNum]-1){
-            m_changeIndex=n;
-        }
-    }
+    void setChangeIndex(int n);
 
-    int getNbPosition() const{
-        return m_nbPositionArray[m_figNum];
-    }
+    int getNbPosition() const;
 
-    auto getChangeArray() const{
-        return m_changeArray[m_figNum];
-    }
+    auto getChangeArray() const;
 
-    auto getChangeAbsArray() const{
-        return m_changeAbsArray[m_figNum];
-    }
+    auto getChangeAbsArray() const;
 
-    int getTopOrdIndex() const{
-        return m_topOrdIndex;
-    }
+    int getTopOrdIndex() const;
 
-    void rotateLeft() {
-        int size = getNbSquares();
-        int changeIndex = getChangeIndex();
-        auto changeArray = getChangeArray();
-        for(int i=0; i<size;i++){
-            m_squaresIndex[i] += changeArray[changeIndex][i];
-            m_squaresVector[i].move(m_side *static_cast<sf::Vector2f> (changeArray[changeIndex][i]));
-        }
-        auto changeAbsArray = getChangeAbsArray();
-        m_leftAbsIndex +=  changeAbsArray[changeIndex].x;
-        m_rightAbsIndex += changeAbsArray[changeIndex].y;
-        increaseChangeIndex();
+    void rotateLeft();
 
-    }
-
-    void rotateRight() {
-        decreaseChangeIndex();
-        int size = getNbSquares();
-        int changeIndex = getChangeIndex();
-        auto changeArray = getChangeArray();
-        for(int i=0; i<size;i++){
-            m_squaresIndex[i] -=  changeArray[changeIndex][i];
-            m_squaresVector[i].move(m_side * -1.0f * static_cast<sf::Vector2f> (changeArray[changeIndex][i]));
-        }
-        auto changeAbsArray = getChangeAbsArray();
-        m_leftAbsIndex -=  changeAbsArray[changeIndex].x;
-        m_rightAbsIndex -= changeAbsArray[changeIndex].y;
-    }
+    void rotateRight();
 
 
 
@@ -615,11 +444,7 @@ class Generator{
 static constexpr std::array<sf::Color,7> m_tetrisColor = { TetrisColor::Yellow , TetrisColor::Blue, TetrisColor::Red , TetrisColor::Magenta , TetrisColor::Green,TetrisColor::Orange,TetrisColor::Cyan};
 public:
 
-static std::shared_ptr<TetrisFigure> newTetrisFigure(int side,int bottomAbsIndex,int bottomOrdIndex,int bottomAbs, int bottomOrd){
-    int figNum = 1 + (std::rand() % 7);
-    sf::Color color = m_tetrisColor[std::rand()%7];
-    return std::make_shared<TetrisFigure>(side,color,bottomAbsIndex,bottomOrdIndex,bottomAbs,bottomOrd,figNum);
-}
+static std::shared_ptr<TetrisFigure> newTetrisFigure(int side,int bottomAbsIndex,int bottomOrdIndex,int bottomAbs, int bottomOrd);
 
  // Le générateur de figure 
 };
@@ -644,33 +469,13 @@ public:
         }
         m_nextFig = Generator::newTetrisFigure(side,5,1,position.x+m_setFig.x,position.y+m_setFig.y);
     }
-    void draw(sf::RenderWindow& window){
-        sf::Text next(m_font);
+    void draw(sf::RenderWindow& window);
 
-        next.setString("NEXT : ");
-        next.setFillColor(sf::Color::White);
-        next.setPosition(sf::Vector2f(m_nextScreen.getPosition().x,m_nextScreen.getPosition().y)+m_setNext);
-        window.draw(m_nextScreen);
-        window.draw(next);
-        m_nextFig->draw(window);
-    }
+    void moveFig(sf::Vector2f vec);
 
-    void moveFig(sf::Vector2f vec){
-        m_nextFig->setNewCoord(vec,m_nextFig->getSide());
-    }
+    sf::Vector2f getPosition();
 
-    sf::Vector2f getPosition(){
-        return m_nextScreen.getPosition();
-    }
-
-    std::shared_ptr<TetrisFigure> transfertFig(int newSide, int newBottomAbsIndex,int newBottomOrdIndex ,int newBottomAbs,int newBottomOrd){
-        m_nextFig->setNewCoord(sf::Vector2f(newBottomAbs,newBottomOrd),newSide);
-        std::shared_ptr<TetrisFigure> newsetFig = m_nextFig;
-        m_nextFig.reset();
-        m_nextFig = Generator::newTetrisFigure(newSide,newBottomAbsIndex,newBottomOrdIndex,m_nextScreen.getPosition().x + m_setFig.x , m_nextScreen.getPosition().y + m_setFig.y);
-        return newsetFig;
-
-    }
+    std::shared_ptr<TetrisFigure> transfertFig(int newSide, int newBottomAbsIndex,int newBottomOrdIndex ,int newBottomAbs,int newBottomOrd);
 };
 
 
@@ -748,297 +553,67 @@ public:
         m_timerToGoDown.restart();
     }
 
-    float getInitX()const{
-        return m_initX;
-    }
+    float getInitX()const;
 
-    float getInitY()const{
-        return m_initY;
-    }
+    float getInitY()const;
 
-    float getSide()const{
-        return m_side;
-    }
+    float getSide()const;
 
-    int getScore()const{
-        return m_score;
-    }
+    int getScore()const;
     
-    int getLevel()const{
-        return m_level;
-    }
+    int getLevel()const;
 
-    bool gameEnded() const{
-        return m_gameEnded;
-    }
+    bool gameEnded() const;
 
-    void autoGoDown(NextScreen& nextScreen){
-        if(m_timerToGoDown.getElapsedTime()>m_timeToGoDown){
-            goDown(nextScreen);
-            m_timerToGoDown.restart();
-        }
-    }
+    void autoGoDown(NextScreen& nextScreen);
     
-    void goDown(NextScreen& nextScreen){
-        m_activFig->goDown();
-        auto squares = m_activFig->getSquaresIndex();
-        if(isCollision()){
-            m_activFig->goUp();
-            if(m_rotateOrTranslate==true){
-                return;
-            }
+    void goDown(NextScreen& nextScreen);
 
-            collision(nextScreen);
-        }
-    }
-
-    void goLeft(){
-        m_activFig->goLeft();
-        if(isCollision()){
-            rotateOrTranslate(false);
-            m_activFig->goRight();
-            return;
-        }
-        rotateOrTranslate(true);
-    }
+    void goLeft();
 
 
-    void goRight(){
-        m_activFig->goRight();
-        if(isCollision()){
-            rotateOrTranslate(false);
-            m_activFig-> goLeft();
-            return;
-        }
-        rotateOrTranslate(true);
-    }
+    void goRight();
 
-    void rotateLeft(){
-        isLeftRotationCollision();
-    }
+    void rotateLeft();
 
-    void rotateRight(){
-        isRightRotationCollision();
-    }
+    void rotateRight();
 
-    void rotateOrTranslate(bool truth){
-        m_rotateOrTranslate=truth;
-    }
+    void rotateOrTranslate(bool truth);
 
-    bool isRotateOrTranslate() const{
-        return m_rotateOrTranslate;
-    }
+    bool isRotateOrTranslate() const;
 
-    void draw(sf::RenderWindow& window){
-        window.draw(m_rectangle);
-        sf::VertexArray vLine(sf::PrimitiveType::Lines, 2);
-        vLine[0].position = sf::Vector2f(m_rectangle.getPosition().x , m_rectangle.getPosition().y);
-        vLine[1].position = sf::Vector2f(m_rectangle.getPosition().x , m_rectangle.getPosition().y+m_side*23);
-        vLine[0].color = sf::Color::White;
-        vLine[1].color = sf::Color::White;
-        for(int i=0;i<=10;i++){
-            window.draw(vLine);
-            vLine[0].position += (sf::Vector2f(m_side,0));
-            vLine[1].position += (sf::Vector2f(m_side,0));   
-        }
-
-
-        sf::VertexArray hLine(sf::PrimitiveType::Lines, 2);
-        hLine[0].position = sf::Vector2f(m_rectangle.getPosition().x ,m_rectangle.getPosition().y );
-        hLine[1].position = sf::Vector2f(m_rectangle.getPosition().x +10*m_side ,m_rectangle.getPosition().y);
-        hLine[0].color = sf::Color::White;
-        hLine[1].color = sf::Color::White;
-        for(int j=0;j<=22;j++){
-            window.draw(hLine);
-            hLine[0].position += (sf::Vector2f(0,m_side));
-            hLine[1].position += (sf::Vector2f(0,m_side));
-        }
-        for(int j=0;j<22;j++){
-            for(int i=0 ;i<10;i++){
-                if(m_isSquare[j][i]!=0){
-                    window.draw(m_gameBoard[j][i]);
-                }
-            }
-        }
-        m_activFig->draw(window);
-    
-    }
+    void draw(sf::RenderWindow& window);
 
 private:
 
 
-    void updateScore(std::vector<int> vec){
-        if(vec.size()==1){
-            m_score+=40*(m_level+1);
-        }
-        else if(vec.size()==2){
-            m_score+=100*(m_level+1);
-        }
-        else if(vec.size()==3){
-            m_score +=300*(m_level+1);
-        }
-        else if(vec.size()==4){
-            m_score+=1200*(m_level+1);
-        }
+    void updateScore(std::vector<int> vec);
 
-    }
+    void updateLevel();
 
-    void updateLevel(){
-        if (m_score>= 500 + 500*(m_level+1)*m_level/2){
-            m_level++;
-            updateTimerToGoDown();
-        }
-        m_timerToGoDown.restart();
-    }
+    void updateTimerToGoDown();
+    bool completedRow(int row);
 
-    void updateTimerToGoDown(){
-        m_timeToGoDown = sf::Time( m_timeForLevels[m_level-1]);
-       
-    }
-    bool completedRow(int row){
-        for(int j=0;j<10;j++){
-            if(m_isSquare[row][j]==0){
-                return false;
-            }
-        }
-        return true;
-    }
+    std::vector<int> getCompletedRow();
 
-    std::vector<int> getCompletedRow(){
-        std::vector<int> vec;
-        for(int i=m_activFig->getBottomOrdIndex();i>= m_activFig->getTopOrdIndex() ; i-- ){
-            if(completedRow(i)){
-                vec.emplace_back(i);
-            }
-        }
-        return vec;
-    }
+    int internSwap(std::vector<int> vec);
 
-    int internSwap(std::vector<int> vec){
-        int emptyRow =1;
-        int nonEmptyRow = 0;
-        int bottomIndex = m_activFig->getBottomOrdIndex();
-        for(int i=vec[0]-1;i>vec.back(); i--){
-            auto it = std::find(vec.begin(), vec.end(), i);
-            if(it==vec.end()){
-                for(int j=0 ; j<10;j++){
-                    if(m_isSquare[i][j]==1){
-                        m_gameBoard[i][j].move(sf::Vector2f(0,m_side*(emptyRow)));
-                     }
-                }
-                std::swap(m_isSquare[bottomIndex - nonEmptyRow],m_isSquare[i]);
-                std::swap(m_gameBoard[bottomIndex - nonEmptyRow],m_gameBoard[i]);
-                nonEmptyRow++;
-            }
-            else{
-                emptyRow++;
-            }
-        }
-        return nonEmptyRow;
-    }
+    void restingSwap(std::vector<int>vec,int nonEmptyRow);
 
-    void restingSwap(std::vector<int>vec,int nonEmptyRow){
-        int bottomIndex = vec[0]-nonEmptyRow;
-        int topIndex = vec.back() -1;
-        for(int i=topIndex;i>=0;i--){
-            for(int j=0 ; j<10;j++){
-                if(m_isSquare[i][j]==1){
-                    m_gameBoard[i][j].move(sf::Vector2f(0,vec.size()*m_side));
-                }
-            }
-            std::swap(m_isSquare[bottomIndex + i-topIndex],m_isSquare[i]);
-            std::swap(m_gameBoard[bottomIndex + i-topIndex],m_gameBoard[i]);            
-        }
-    }
-
-    void erase(std::vector<int> vec){
-        for(auto& value : vec){
-            m_isSquare[value].fill(0);
-            m_gameBoard[value].clear();
-            m_gameBoard[value].resize(10);
-        }
-    }
+    void erase(std::vector<int> vec);
 
 
-    void collision(NextScreen& nextScreen){
-        auto SquaresIndex = m_activFig->getSquaresIndex();
-        if(m_activFig->getTopOrdIndex()<0 || (m_activFig->getBottomOrdIndex()==1 && m_activFig->getBottomAbsIndex()==5 &&  m_activFig->getBottomOrdIndex()-m_activFig->getTopOrdIndex()>=1)){
-            m_gameEnded =true;
-        }
-        if(!m_gameEnded){
-            for(int i=0 ; i <SquaresIndex.size();i++){
-                m_gameBoard[SquaresIndex[i].y][SquaresIndex[i].x]= Square(m_side,m_activFig->getColor(),m_initX + SquaresIndex[i].x*m_side , m_initY + SquaresIndex[i].y*m_side  );
-                m_isSquare[SquaresIndex[i].y][SquaresIndex[i].x] = 1;
-            }
-            std::vector<int> rowCompleted = getCompletedRow();
-            if(rowCompleted.size()>0){
-                erase(rowCompleted);
-                int nonEmptyRow = internSwap(rowCompleted);
-                restingSwap(rowCompleted,nonEmptyRow);
-                updateScore(rowCompleted);
-                updateLevel();
-            }
-                m_activFig.reset();
-                m_activFig = nextScreen.transfertFig(m_side,5,1,m_initX+5*m_side,m_initY+1*m_side);
-        }
-    }
+    void collision(NextScreen& nextScreen);
 
 
 
 
-    bool isCollision(){
-        if(m_activFig->getRightAbsIndex()>9 || m_activFig->getLeftAbsIndex()<0 || m_activFig->getBottomOrdIndex()>21){
-            return true;
-        }
-        auto SquaresIndex = m_activFig-> getSquaresIndex();
-        for(int i=0 ; i<SquaresIndex.size();i++){
-            if(SquaresIndex[i].y>=0){
-                if(m_isSquare[SquaresIndex[i].y][SquaresIndex[i].x]!=0){
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+    bool isCollision();
 
-    bool isLeftRotationCollision(){
-        m_activFig->rotateLeft();
-        if(isCollision()){
-            m_activFig->goRight();
-            if(isCollision()){
-                m_activFig->goRight();
-                if(isCollision()){
-                    m_activFig->goLeft();
-                    m_activFig->goLeft();
-                    m_activFig->rotateRight();
-                    rotateOrTranslate(false);
-                    return true;
-                }
-            }
-        }
-        rotateOrTranslate(true);
-        return false;
-    }
+    bool isLeftRotationCollision();
 
 
-    bool isRightRotationCollision(){
-        m_activFig->rotateRight();
-        if(isCollision()){
-            m_activFig->goRight();
-            if(isCollision()){
-                m_activFig->goRight();
-                if(isCollision()){
-                    m_activFig->goLeft();
-                    m_activFig->goLeft();
-                    m_activFig->rotateLeft();
-                    rotateOrTranslate(false);
-                    return true;
-                }
-            }
-        }
-        rotateOrTranslate(true);
-        return false;
-    }
+    bool isRightRotationCollision();
 
 
 };
@@ -1073,53 +648,19 @@ public:
     }
 
 
-void setScore(unsigned int score){
-    m_score = score;
-    m_getScore = true;
-}
+void setScore(unsigned int score);
 
-void setLevel(unsigned int level){
-    m_level = level;
-    m_getLevel = true;
-}
-void setSize(const sf::Vector2f& vec){
-    m_scoreScreen.setSize(vec);
-}
+void setLevel(unsigned int level);
+void setSize(const sf::Vector2f& vec);
 
-void setPosition(const sf::Vector2f& vec){
-    m_scoreScreen.setPosition(vec);
-}
+void setPosition(const sf::Vector2f& vec);
 
-void moveScore(const sf::Vector2f& vec){
-    m_setScore = m_setScore + vec;
-}
+void moveScore(const sf::Vector2f& vec);
 
 
-sf::Vector2f getPosition()const{
-    return m_scoreScreen.getPosition();
-}
+sf::Vector2f getPosition()const;
 
-void draw(sf::RenderWindow& window){
-    window.draw(m_scoreScreen);
-    if(m_getScore){
-        std::string strScore = std::to_string(m_score);
-        strScore = "Score : " + strScore;
-        sf::Text score(m_font);
-        score.setString(strScore);
-        score.setFillColor(sf::Color::White);
-        score.setPosition(sf::Vector2f(m_scoreScreen.getPosition().x,m_scoreScreen.getPosition().y)+m_setScore);
-        window.draw(score);
-    }
-    if(m_getLevel){
-        std::string strLevel = std::to_string(m_level);
-        strLevel = "Level : " + strLevel; 
-        sf::Text level(m_font);
-        level.setString(strLevel);
-        level.setFillColor(sf::Color::White);
-        level.setPosition(sf::Vector2f(m_scoreScreen.getPosition().x,m_scoreScreen.getPosition().y)+m_setLevel);
-        window.draw(level);
-    }
-}
+void draw(sf::RenderWindow& window);
 
 };
 
@@ -1138,52 +679,26 @@ public:
         scoreScreen.setScore(0);
     }
 
-    void goDown(){
-        gameBoard.goDown(nextScreen);
-        // goDown( (std::shared_ptr<TetrisFigure>) (*foo) (int a, int b, int c, int d, int e) = Generator::newTetrisFigure)
-    }
+    void goDown();
 
-    void autoGoDown(){
-        gameBoard.autoGoDown(nextScreen);
-    }
+    void autoGoDown();
 
-    void goLeft(){
-        gameBoard.goLeft();
-    }
+    void goLeft();
 
-    void goRight(){
-        gameBoard.goRight();
-    }
+    void goRight();
 
 
-    void rotateLeft(){
-        gameBoard.rotateLeft();
-    }
+    void rotateLeft();
 
-    void rotateRight(){
-        gameBoard.rotateRight();
-    }
+    void rotateRight();
 
-    bool gameEnded() const{
-        return gameBoard.gameEnded();
-    }
+    bool gameEnded() const;
 
-    void rotateOrTranslate(bool truth){
-        gameBoard.rotateOrTranslate(truth);
-    }
+    void rotateOrTranslate(bool truth);
 
-    bool isRotateOrTranslate(){
-        return gameBoard.isRotateOrTranslate();
-    }
+    bool isRotateOrTranslate();
 
-    void draw(sf::RenderWindow& window){
-        scoreScreen.setScore(gameBoard.getScore()); 
-        scoreScreen.setLevel(gameBoard.getLevel());
-        gameBoard.draw(window);
-        scoreScreen.draw(window);
-        nextScreen.draw(window);
-
-    }
+    void draw(sf::RenderWindow& window);
 
 };
 
